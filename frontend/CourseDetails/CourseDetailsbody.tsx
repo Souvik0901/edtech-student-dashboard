@@ -8,8 +8,10 @@ import instructor01 from '../../components/assets/images/avatar/05.jpg'
 const CourseDetailsbody = () => {
 
 
-
-
+  const [activeStep, setActiveStep] = useState('Overview');
+  const handleStepClick = (step: React.SetStateAction<string>) => {
+    setActiveStep(step);
+  };
 
   return (
     <section className="pb-0 py-lg-5">
@@ -28,23 +30,73 @@ const CourseDetailsbody = () => {
 									<ul className="nav nav-pills nav-tabs-line pt-0" id="course-pills-tab" role="tablist">
 									
 										<li className="nav-item me-2 me-sm-4" role="presentation">
-											<button className="nav-link mb-2 mb-md-0 active" id="course-pills-tab-1" data-bs-toggle="pill" data-bs-target="#course-pills-1" type="button" role="tab" aria-controls="course-pills-1" aria-selected="true">Overview</button>
+											<button className={`nav-link mb-2 mb-md-0 ${activeStep === 'Overview' ? 'active' : ''}`}  
+											        id="course-pills-tab-1"
+														  data-bs-toggle="pill" 
+															data-bs-target="#course-pills-1" 
+															type="button" role="tab" 
+															aria-controls="course-pills-1" 
+															aria-selected={activeStep === 'Overview'}
+															onClick={()=> handleStepClick('Overview')}
+											>
+											Overview
+											</button>
 										</li>
 									
 										<li className="nav-item me-2 me-sm-4" role="presentation">
-											<button className="nav-link mb-2 mb-md-0" id="course-pills-tab-2" data-bs-toggle="pill" data-bs-target="#course-pills-2" type="button" role="tab" aria-controls="course-pills-2" aria-selected="false">Curriculum</button>
+											<button className={`nav-link mb-2 mb-md-0 ${activeStep === 'Curriculum' ? 'active' : ''}`} 
+											        id="course-pills-tab-2" 
+															data-bs-toggle="pill" 
+															data-bs-target="#course-pills-2" 
+															type="button" role="tab" 
+															aria-controls="course-pills-2" 
+															aria-selected={activeStep === 'Curriculum'}
+															onClick={()=> handleStepClick('Curriculum')}
+											>
+											Curriculum
+											</button>
 										</li>
 									
 										<li className="nav-item me-2 me-sm-4" role="presentation">
-											<button className="nav-link mb-2 mb-md-0" id="course-pills-tab-3" data-bs-toggle="pill" data-bs-target="#course-pills-3" type="button" role="tab" aria-controls="course-pills-3" aria-selected="false">Instructor</button>
+											<button className={`nav-link mb-2 mb-md-0 ${activeStep === 'Instructor' ? 'active' : ''}`} 
+															id="course-pills-tab-3" 
+															data-bs-toggle="pill" 
+															data-bs-target="#course-pills-3" 
+															type="button" role="tab" 
+															aria-controls="course-pills-3" 
+															aria-selected={activeStep === 'Instructor'}
+															onClick={()=> handleStepClick('Instructor')}
+											>
+											Instructor
+											</button>
 										</li>
 										
 										<li className="nav-item me-2 me-sm-4" role="presentation">
-											<button className="nav-link mb-2 mb-md-0" id="course-pills-tab-4" data-bs-toggle="pill" data-bs-target="#course-pills-4" type="button" role="tab" aria-controls="course-pills-4" aria-selected="false">Reviews</button>
+											<button className={`nav-link mb-2 mb-md-0 ${activeStep === 'Reviews' ? 'active' : ''}`} 
+											        id="course-pills-tab-4" 
+															data-bs-toggle="pill" 
+															data-bs-target="#course-pills-4" 
+															type="button" role="tab" 
+															aria-controls="course-pills-4" 
+															aria-selected={activeStep === 'Reviews'}
+															onClick={()=> handleStepClick('Reviews')}
+											>
+											Reviews
+											</button>
 										</li>
 										
 										<li className="nav-item me-2 me-sm-4" role="presentation">
-											<button className="nav-link mb-2 mb-md-0" id="course-pills-tab-5" data-bs-toggle="pill" data-bs-target="#course-pills-5" type="button" role="tab" aria-controls="course-pills-5" aria-selected="false">FAQs </button>
+											<button className={`nav-link mb-2 mb-md-0 ${activeStep === 'FAQs' ? 'active' : ''}`} 
+											        id="course-pills-tab-5" 
+															data-bs-toggle="pill" 
+															data-bs-target="#course-pills-5" 
+															type="button" role="tab" 
+															aria-controls="course-pills-5" 
+															aria-selected={activeStep === 'FAQs'}
+															onClick={()=> handleStepClick('FAQs')}
+											>
+											FAQs 
+											</button>
 										</li>
 									</ul>
 
@@ -55,6 +107,8 @@ const CourseDetailsbody = () => {
 							
 
 							      {/* course-pills-01 */}
+
+										{ activeStep === 'Overview' &&
 										<div className="tab-pane fade show active" id="course-pills-1" role="tabpanel" aria-labelledby="course-pills-tab-1">
 										
 											<h5 className="mb-3">Course Description</h5>
@@ -82,9 +136,12 @@ const CourseDetailsbody = () => {
 									
 
 										</div>
-							      
+                    }
+     
 										{/* course-pills-02 */}
-										<div className="tab-pane fade" id="course-pills-2" role="tabpanel" aria-labelledby="course-pills-tab-2">
+
+										{ activeStep === 'Curriculum' &&
+										<div className="tab-pane fade show active" id="course-pills-2" role="tabpanel" aria-labelledby="course-pills-tab-2">
 										
 											<div className="accordion accordion-icon accordion-bg-light" id="accordionExample2">
 										
@@ -691,9 +748,11 @@ const CourseDetailsbody = () => {
 											</div>
 											
 										</div>
+                    }
 								
 								    {/* course-pills-03 */}
-										<div className="tab-pane fade" id="course-pills-3" role="tabpanel" aria-labelledby="course-pills-tab-3">
+										{ activeStep === 'Instructor' &&
+										<div className="tab-pane fade show active" id="course-pills-3" role="tabpanel" aria-labelledby="course-pills-tab-3">
 										
 											<div className="card mb-0 mb-md-4">
 												<div className="row g-0 align-items-center">
@@ -759,7 +818,9 @@ const CourseDetailsbody = () => {
 											</div>
 										
 											<h5 className="mb-3">About Instructor</h5>
-											<p className="mb-3">Fulfilled direction use continual set him propriety continued. Saw met applauded favorite deficient engrossed concealed and her. Concluded boy perpetual old supposing. Farther related bed and passage comfort civilly. Dashboards see frankness objection abilities. As hastened oh produced prospect formerly up am. Placing forming nay looking old married few has. Margaret disposed of add screened rendered six say his striking confined. </p>
+											<p className="mb-3">Fulfilled direction use continual set him propriety continued. Saw met applauded favorite deficient engrossed concealed and her. Concluded boy perpetual old supposing. Farther related bed and passage comfort civilly. Dashboards see frankness objection abilities.
+                                                                                        As hastened oh produced prospect formerly up am. Placing forming nay looking old married few has. 
+                                                                                         Margaret disposed of add screened rendered six say his striking confined. </p>
 											<p className="mb-3">As it so contrasted oh estimating instrument. Size like body someone had. Are conduct viewing boy minutes warrant the expense? Tolerably behavior may admit daughters offending her ask own. Praise effect wishes change way and any wanted.</p>
 									
 											<div className="col-12">
@@ -769,9 +830,11 @@ const CourseDetailsbody = () => {
 												</ul>
 											</div>
 										</div>
+                    }
 							
 							      {/* course-pills-04 */}
-										<div className="tab-pane fade" id="course-pills-4" role="tabpanel" aria-labelledby="course-pills-tab-4">
+										{activeStep === 'Reviews' &&
+										<div className="tab-pane fade show active" id="course-pills-4" role="tabpanel" aria-labelledby="course-pills-tab-4">
 								
 											<div className="row mb-4">
 												<h5 className="mb-4">Our Student Reviews</h5>
@@ -969,7 +1032,8 @@ const CourseDetailsbody = () => {
 														</div>
 												
 														<p className="small mb-2">2 days ago</p>
-														<p className="mb-2">Handsome met debating sir dwelling age material. As style lived he worse dried. Offered related so visitors we private removed. Moderate do subjects to distance. </p>
+														<p className="mb-2">Handsome met debating sir dwelling age material. As style lived he worse dried. 
+															Offered related so visitors we private removed. Moderate do subjects to distance. </p>
 													
 														<div className="btn-group" role="group" aria-label="Basic radio toggle button group">
 														
@@ -1019,89 +1083,110 @@ const CourseDetailsbody = () => {
 											
 
 										</div>
+                    }
 									
-									  {/* course-pills-05 */}
-										<div className="tab-pane fade" id="course-pills-5" role="tabpanel" aria-labelledby="course-pills-tab-5">
-										
-											<h5 className="mb-3">Frequently Asked Questions</h5>
-										
-											<div className="accordion accordion-flush" id="accordionExample">
-							
-												<div className="accordion-item">
-													<h2 className="accordion-header" id="headingOne">
-														<button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-															<span className="text-secondary fw-bold me-3">01</span>  
-															<span className="fw-bold">How Digital Marketing Work?</span> 
-														</button>
-													</h2>
-													<div id="collapseOne" className="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-														<div className="accordion-body pt-0">
-															Comfort reached gay perhaps chamber his six detract besides add. Moonlight newspaper up its enjoyment agreeable depending. Timed voice share led him to widen noisy young. At weddings believed laughing although the material does the exercise of. Up attempt offered ye civilly so sitting to. She new course gets living within Elinor joy. She rapturous suffering concealed. 
-														</div>
-													</div>
-												</div>
-										
-												<div className="accordion-item">
-													<h2 className="accordion-header" id="headingTwo">
-														<button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-															<span className="text-secondary fw-bold me-3">02</span>  
-															<span className="fw-bold">What is SEO?</span> 
-														</button>
-													</h2>
-													<div id="collapseTwo" className="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
-														<div className="accordion-body pt-0">
-															Pleasure and so read the was hope entire first decided the so must have as on was want up of I will rival in came this touched got a physics to travelling so all especially refinement monstrous desk they was arrange the overall helplessly out of particularly ill are purer.
-															<p className="mt-2">Person she control of to beginnings view looked eyes Than continues its and because and given and shown creating curiously to more in are man were smaller by we instead the these sighed Avoid in the sufficient me real man longer of his how her for countries to brains warned notch important Finds be to the of on the increased explain noise of power deep asking contribution this live of suppliers goals bit separated poured sort several the was organization the if relations go work after mechanic But we've area wasn't everything needs of and doctor where would.</p>	
-															Go he prisoners And mountains in just switching city steps Might rung line what Mr Bulk; Was or between towards the have phase were its world my samples are the was royal he luxury the about trying And on he to my enough is was the remember a although lead in were through serving their assistant fame day have for its after would cheek dull have what in go feedback assignment Her of a any help if the a of semantics is rational overhauls following in from our hazardous and used more he themselves the parents up just regulatory.
-														</div>
-													</div>
-												</div>
-											
-												<div className="accordion-item">
-													<h2 className="accordion-header" id="headingThree">
-														<button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-															<span className="text-secondary fw-bold me-3">03</span>  
-															<span className="fw-bold">Who should join this course?</span> 
-														</button>
-													</h2>
-													<div id="collapseThree" className="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
-														<div className="accordion-body pt-0">
-															Post no so what deal evil rent by real in. But her ready least set lived spite solid. September how men saw tolerably two behavior arranging. She offices for highest and replied one venture pasture. Applauded no discovery in newspaper allowance am northward. Frequently partiality possession resolution at or appearance unaffected me. Engaged its was the evident pleased husband. Ye goodness felicity do disposal dwelling no. First am plate jokes to began to cause a scale. <strong>Subjects he prospect elegance followed no overcame</strong> possible it on. 
-														</div>
-													</div>
-												</div>
-												
-												<div className="accordion-item">
-													<h2 className="accordion-header" id="headingFour">
-														<button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
-															<span className="text-secondary fw-bold me-3">04</span>  
-															<span className="fw-bold">What are the T&C for this program?</span> 
-														</button>
-													</h2>
-													<div id="collapseFour" className="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#accordionExample">
-														<div className="accordion-body pt-0">
-															Night signs creeping yielding green Seasons together man green fruitful make fish behold earth unto you'll lights living moving sea open for fish day multiply tree good female god had fruitful of creature fill shall don't day fourth lesser he the isn't let multiply may Creeping earth under was You're without which image stars in Own creeping night of wherein Heaven years their he over doesn't whose won't kind seasons light Won't that fish him whose won't also it dominion heaven fruitful Whales created And likeness doesn't that Years without divided saying morning creeping hath you'll seas cattle in multiply under together in us said above dry tree herb saw living darkness without have won't for i behold meat brought winged Moving living second beast Over fish place beast image very him evening Thing they're fruit together forth day Seed lights Land creature together Multiply waters form brought.
-														</div>
-													</div>
-												</div>
-											
-												<div className="accordion-item">
-													<h2 className="accordion-header" id="headingFive">
-														<button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
-															<span className="text-secondary fw-bold me-3">05</span>  
-															<span className="fw-bold">What certificates will I be received for this program?</span> 
-														</button>
-													</h2>
-													<div id="collapseFive" className="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#accordionExample">
-														<div className="accordion-body pt-0">
-															Smile spoke total few great had never their too Amongst moments do in arrived at my replied Fat weddings servants but man believed prospect Companions understood is as especially pianoforte connection introduced Nay newspaper can sportsman are admitting gentleman belonging his Is oppose no he summer lovers twenty in Not his difficulty boisterous surrounded bed Seems folly if in given scale Sex contented dependent conveying advantage. 
-														</div>
+										{/* course-pills-05 */}
+										{activeStep === 'FAQs' &&
+										<div className="tab-pane fade show active" id="course-pills-5" role="tabpanel" aria-labelledby="course-pills-tab-5">
+
+										<h5 className="mb-3">Frequently Asked Questions</h5>
+
+										<div className="accordion accordion-flush" id="accordionExample">
+
+											<div className="accordion-item">
+												<h2 className="accordion-header" id="headingOne">
+													<button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+														<span className="text-secondary fw-bold me-3">01</span>  
+														<span className="fw-bold">How Digital Marketing Work?</span> 
+													</button>
+												</h2>
+												<div id="collapseOne" className="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+													<div className="accordion-body pt-0">
+														Comfort reached gay perhaps chamber his six detract besides add. Moonlight newspaper up its enjoyment agreeable depending. Timed voice share led him to widen noisy young.
+														At weddings believed laughing although the material does the exercise of. Up attempt offered ye civilly so sitting to. She new course gets living within Elinor joy. 
+														She rapturous suffering concealed. 
 													</div>
 												</div>
 											</div>
-										
+
+											<div className="accordion-item">
+												<h2 className="accordion-header" id="headingTwo">
+													<button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+														<span className="text-secondary fw-bold me-3">02</span>  
+														<span className="fw-bold">What is SEO?</span> 
+													</button>
+												</h2>
+												<div id="collapseTwo" className="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+													<div className="accordion-body pt-0">
+														Pleasure and so read the was hope entire first decided the so must have as on was want up of I will rival in came this touched got a physics to 
+														travelling so all especially refinement monstrous desk they was arrange the overall helplessly out of particularly ill are purer.
+														<p className="mt-2">Person she control of to beginnings view looked eyes Than continues its and because and given and 
+															shown creating curiously to more in are man were smaller by we instead the these sighed Avoid in the sufficient me real man longer of his how her for 
+															countries to brains warned notch important Finds be to the of on the increased explain noise of power deep asking contribution this live of suppliers 
+															goals bit separated poured sort several the was organization the if relations go work after mechanic But we've area wasn't everything needs of and doctor where would.
+														</p>	
+														Go he prisoners And mountains in just switching city steps Might rung line what Mr Bulk; Was or between towards the have 
+														phase were its world my samples are the was royal he luxury the about trying And on he to my enough is was the remember a 
+														although lead in were through serving their assistant fame day have for its after would cheek dull have what in go feedback assignment Her of 
+														a any help if the a of semantics is rational overhauls following in from our hazardous and used more he themselves the parents up just regulatory.
+													</div>
+												</div>
+											</div>
+
+											<div className="accordion-item">
+												<h2 className="accordion-header" id="headingThree">
+													<button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+														<span className="text-secondary fw-bold me-3">03</span>  
+														<span className="fw-bold">Who should join this course?</span> 
+													</button>
+												</h2>
+												<div id="collapseThree" className="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
+													<div className="accordion-body pt-0">
+														Post no so what deal evil rent by real in. But her ready least set lived spite solid. September how men saw tolerably two behavior arranging.
+														She offices for highest and replied one venture pasture. Applauded no discovery in newspaper allowance am northward.
+														Frequently partiality possession resolution at or appearance unaffected me. Engaged its was the evident pleased husband. 
+														Ye goodness felicity do disposal dwelling no. First am plate jokes to began to cause a scale. <strong>Subjects he prospect elegance followed no overcame</strong> possible it on. 
+													</div>
+												</div>
+											</div>
+											
+											<div className="accordion-item">
+												<h2 className="accordion-header" id="headingFour">
+													<button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+														<span className="text-secondary fw-bold me-3">04</span>  
+														<span className="fw-bold">What are the T&C for this program?</span> 
+													</button>
+												</h2>
+												<div id="collapseFour" className="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#accordionExample">
+													<div className="accordion-body pt-0">
+														Night signs creeping yielding green Seasons together man green fruitful make fish behold earth unto you'll lights living moving sea open for fish day multiply tree
+														good female god had fruitful of creature fill shall don't day fourth lesser he the isn't let multiply may Creeping earth under was You're without which image stars in Own 
+														creeping night of wherein Heaven years their he over doesn't whose won't kind seasons light Won't that fish him whose won't also it dominion heaven fruitful Whales created
+														And likeness doesn't that Years without divided saying morning creeping hath you'll seas cattle in multiply under together in us said above dry tree herb saw
+														living darkness without have won't for i behold meat brought winged Moving living second beast Over fish place beast image very him evening Thing they're fruit 
+														together forth day Seed lights Land creature together Multiply waters form brought.
+													</div>
+												</div>
+											</div>
+
+											<div className="accordion-item">
+												<h2 className="accordion-header" id="headingFive">
+													<button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+														<span className="text-secondary fw-bold me-3">05</span>  
+														<span className="fw-bold">What certificates will I be received for this program?</span> 
+													</button>
+												</h2>
+												<div id="collapseFive" className="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#accordionExample">
+													<div className="accordion-body pt-0">
+														Smile spoke total few great had never their too Amongst moments do in arrived at my replied Fat weddings servants but man believed prospect Companions understood is as especially pianoforte connection introduced Nay newspaper can sportsman are admitting gentleman belonging his Is oppose no he summer lovers twenty in Not his difficulty boisterous surrounded bed Seems folly if in given scale Sex contented dependent conveying advantage. 
+													</div>
+												</div>
+											</div>
 										</div>
-									
+
+										</div>
+										}
+
 									</div>
 							
 							</div>
