@@ -58,7 +58,7 @@ const createCourseWithImage = async (req, res) => {
 };
 
 // get all courses
-const getCourse = async (req, res) => {
+const getCourses = async (req, res) => {
   const search = req.query.search || '';
   const courseLevel = req.query.courseLevel || '';
   const courseLanguage = req.query.courseLanguage || '';
@@ -129,18 +129,23 @@ const getCourse = async (req, res) => {
 };
 
 // get all courses
-const getCourses = async (req, res) => {
-  const { userId } = req.user;
-
-  const search = req.query.search || '';
-  const query = {
-    courseTitle: { $regex: search, $options: 'i' },
-  };
-
+const getSingleCourse = async (req, res) => {
+  const { id } = req.params;
   try {
-    const courses = await Courses.find({ user_id: userId, ...query }).sort({ createdAt: 1 });
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.send(
+        newResponseObject.create({
+          code: 200,
+          success: false,
+          message: 'No Courses Found',
+          data: {},
+        }),
+      );
+    }
 
-    if (!courses || courses.length === 0) {
+    const course = await Courses.findById(id);
+
+    if (!course) {
       return res.send(
         newResponseObject.create({
           code: 200,
@@ -155,8 +160,8 @@ const getCourses = async (req, res) => {
       newResponseObject.create({
         code: 200,
         success: true,
-        message: 'Showing Course Successfully',
-        data: courses,
+        message: 'showing course details',
+        data: course,
       }),
     );
   } catch (error) {
@@ -356,10 +361,11 @@ const updateCourse = async (req, res) => {
 };
 
 module.exports = {
-  getCourses,
+  getSingleCourse,
   paginatedCourses,
   deleteCourse,
   updateCourse,
   createCourseWithImage,
-  getCourse,
+  getCourses,
 };
+
