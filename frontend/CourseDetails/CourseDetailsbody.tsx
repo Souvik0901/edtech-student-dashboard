@@ -3,12 +3,13 @@ import React, { ChangeEvent, useState, useEffect } from 'react';
 import Image from 'next/image';
 import avatar from '../../components/assets/images/avatar/09.jpg'
 import course08 from '../../components/assets/images/courses/4by3/08.jpg'
-import instructor01 from '../../components/assets/images/instructor/01.jpg';
 import { axiosInstance } from '@/redux/interceptors';
 import { SERVICE_URL } from '@/utils/endpoint';
 
-import { FaRegCheckCircle, FaFacebook, FaTwitter, FaInstagram, FaLinkedin, FaYoutube, FaStar, FaPlay, FaUserGraduate, FaStarHalfAlt, FaRegStar, 
-	      FaRegThumbsUp,FaRegThumbsDown, FaBookOpen,FaClock, FaSignal, FaGlobe, FaMedal, FaUserClock   } from "react-icons/fa";
+import { FaRegCheckCircle, FaFacebook, FaTwitter, FaInstagram,
+	       FaLinkedin, FaYoutube, FaStar, FaPlay, FaUserGraduate,
+				 FaStarHalfAlt, FaRegStar, FaRegThumbsUp, FaRegThumbsDown, 
+				 FaBookOpen, FaClock, FaSignal, FaGlobe, FaMedal, FaUserClock} from "react-icons/fa";
 import { AiOutlineMessage } from "react-icons/ai";
 
 type AccordionState = {
@@ -58,7 +59,6 @@ const CourseDetailsbody = () => {
       [item]: !prevState[item],
     }));
   };
-
 	
   const handleStepClick = (step: React.SetStateAction<string>) => {
     setActiveStep(step);
@@ -116,7 +116,9 @@ const CourseDetailsbody = () => {
 					<h6 className="mb-3 font-base bg-primary text-white py-2 px-4 rounded-2 d-inline-block">{course.courseCategory}</h6>
 			
 					<h1>{course.courseTitle}</h1>
-					<p>Satisfied conveying a dependent contented he gentleman agreeable do be. Warrant private blushes removed an in equally totally if. Delivered dejection necessary objection do Mr prevailed. Mr feeling does chiefly cordial in do.</p>
+					<p>Satisfied conveying a dependent contented he gentleman agreeable do be. Warrant private blushes removed an in equally totally if. 
+						Delivered dejection necessary objection do Mr prevailed. Mr feeling does chiefly cordial in do.
+					</p>
 				
 					<ul className="banner-list-item">
 						<li className="banner-list-items-content"><i className="fas fa-star text-warning me-2"><FaStar/></i>4.5/5.0</li>
@@ -132,6 +134,7 @@ const CourseDetailsbody = () => {
 			</div>
 		</div>
 	  </section>
+		
     <section className="pb-0 py-lg-5">
 
 				<div className="container">
@@ -928,7 +931,7 @@ const CourseDetailsbody = () => {
 																	<ul className="list-inline">
 																	<li className="list-inline-item">
 																		<div className="d-flex align-items-center me-3 mb-2">
-																			<span className="icon-md bg-orange bg-opacity-10 text-orange rounded-circle flex justify-center align-center"><i className="fas fa-user-graduate"><FaUserGraduate className='h-[]'/></i></span>
+																			<span className="icon-md bg-orange bg-opacity-10 text-orange rounded-circle flex justify-center align-center"><i className="fas fa-user-graduate"><FaUserGraduate/></i></span>
 																			<span className="h6 fw-light mb-0 ms-2">9.1k</span>
 																		</div>
 																	</li>
@@ -957,10 +960,17 @@ const CourseDetailsbody = () => {
 													</div>
 											
 													<h5 className="mb-3">About Instructor</h5>
-													<p className="mb-3">Fulfilled direction use continual set him propriety continued. Saw met applauded favorite deficient engrossed concealed and her. Concluded boy perpetual old supposing. Farther related bed and passage comfort civilly. 
-                                                                                                            Dashboards see frankness objection abilities. As hastened oh produced prospect formerly up am. Placing forming nay looking old married few has. Margaret disposed of add screened rendered six say his striking confined. </p>
+													<p className="mb-3">Fulfilled direction use continual set him propriety continued. 
+													  Saw met applauded favorite deficient engrossed concealed and her. 
+														Concluded boy perpetual old supposing. Farther related bed and passage comfort civilly.
+														Dashboards see frankness objection abilities. As hastened oh produced prospect formerly up am.
+														Placing forming nay looking old married few has. 
+														disposed of add screened rendered six say his striking confined. 
+													</p>
 													<p className="mb-3">As it so contrasted oh estimating instrument. Size like body someone had. 
-                                                                                                             Are conduct viewing boy minutes warrant the expense? Tolerably behavior may admit daughters offending her ask own. Praise effect wishes change way and any wanted.</p>
+													    Are conduct viewing boy minutes warrant the expense? Tolerably behavior may admit daughters offending her ask own. 
+															Praise effect wishes change way and any wanted.
+													</p>
 											
 													<div className="col-12">
 														<ul className="list-group list-group-borderless mb-0">
