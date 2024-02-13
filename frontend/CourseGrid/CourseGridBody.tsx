@@ -19,6 +19,7 @@ interface course {
   price: number;
   courseLevel: string;
   courseLanguage: string;
+  _id: string
 }
 
 
@@ -37,7 +38,7 @@ const CourseGridBody = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await axiosInstance.get(`${SERVICE_URL}getcourse`,{
+        const response = await axiosInstance.get(`${SERVICE_URL}getcourses`,{
           params: { 
             courseLevel: selectedskills.join(','), 
             courseLanguage: selectedlanguages.join(','), 
@@ -149,7 +150,7 @@ const CourseGridBody = () => {
                       <a href="#" className="h6 fw-light mb-0"><i className="far fa-heart"><FcLike /></i></a>
                     </div>
 
-                    <h5 className="card-title"><a href="#">{course.courseTitle}</a></h5>
+                    <h5 className="card-title"><a href={`/course-details?courseId=${course._id}`}>{course.courseTitle}</a></h5>
                     <p className="mb-2 text-truncate-2">Proposal indulged no do sociable he throwing settling.</p>
 
                     <ul className="list-inline mb-0">
@@ -167,7 +168,7 @@ const CourseGridBody = () => {
                     <div className="lower-cont">
                       <span className="clock"><FiClock/>10h 00m</span>
                       <span className="lect"><AiOutlineSchedule />{course.lectures} lectures</span>
-                      {/* <span className="h6 fw-light mb-0"><i><AiOutlineSchedule /></i>{course.lectures} lectures</span> */}
+
                     </div>
                   </div>
                 </div>
