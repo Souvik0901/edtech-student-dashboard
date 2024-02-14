@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const ResponseObjectClass = require('../helpers/ResponseObject');
 const Courses = require('../models/courses');
 const newResponseObject = new ResponseObjectClass();
+const RecentlyViewed = require('../models/recentlyviewed');
 
 
 // create a  single course
@@ -127,7 +128,6 @@ const getCourses = async (req, res) => {
   }
 };
 
-
 // get single course
 const getSingleCourse = async (req, res) => {
   const { userId } = req.user;
@@ -156,6 +156,10 @@ const getSingleCourse = async (req, res) => {
         }),
       );
     }
+    
+    // Store the recently viewed course with timestamp
+    await RecentlyViewed.create({ userId, courseId: id, viewedAt: new Date() });
+
 
     return res.send(
       newResponseObject.create({
@@ -177,6 +181,38 @@ const getSingleCourse = async (req, res) => {
 };
 
 
+// API to fetch recently viewed courses within a time range
+const getRecentlyViewedCourses = async (req, res) => {
+  const { userId } = req.user;
+
+  try {
+    const recentlyViewed = await RecentlyViewed.find({ userId })
+      .sort({ viewedAt: -1 }) // Sort by viewedAt field in descending order
+
+
+    // Fetch details of the recently viewed courses
+    const courses = await Promise.all(
+      recentlyViewed.map(async (item) => {
+        const course = await Courses.findById(item.courseId);
+        return course;
+      })
+    );
+
+    return res.send({
+      code: 200,
+      success: true,
+      message: 'Showing recently viewed courses',
+      data: courses,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      code: 500,
+      success: false,
+      message: 'Internal server error',
+    });
+  }
+};
 
 // get all paginated courses
 const paginatedCourses = async (req, res) => {
@@ -248,7 +284,6 @@ const paginatedCourses = async (req, res) => {
   }
 };
 
-
 // delete a single course
 const deleteCourse = async (req, res) => {
   const { id } = req.params;
@@ -295,7 +330,6 @@ const deleteCourse = async (req, res) => {
     );
   }
 };
-
 
 //update a single  course
 const updateCourse = async (req, res) => {
@@ -370,6 +404,7 @@ const updateCourse = async (req, res) => {
 
 
 
+
 module.exports = {
   getSingleCourse,
   paginatedCourses,
@@ -377,5 +412,6 @@ module.exports = {
   updateCourse,
   createCourseWithImage,
   getCourses,
+  getRecentlyViewedCourses,
 };
 
