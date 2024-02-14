@@ -38,17 +38,40 @@ router.post('/logout', userController.logout);
 router.get('/getuserdata', authenticateUser.verifytoken, getUserControllers.getUser);
 router.get('/removeuser', authenticateUser.verifytoken, deleteAccount.removeUser);
 router.get('/getenrollmentlist', authenticateUser.verifytoken, enrollmentList.getStudentDetails);
-router.post('/updateprofileinfo',authenticateUser.verifytoken,upload.single('profileImg'),editProfile.changeUserdata,);
+router.post(
+  '/updateprofileinfo',
+  authenticateUser.verifytoken,
+  upload.single('profileImg'),
+  editProfile.changeUserdata,
+);
 router.get('/getsingleuser/:id', authenticateUser.verifytoken, getUserControllers.getSingleUser);
 
-router.post('/createcoursewithimage',authenticateUser.verifytoken,upload.single('courseImage'),courseControllers.createCourseWithImage);
+router.post(
+  '/createcoursewithimage',
+  authenticateUser.verifytoken,
+  upload.single('courseImage'),
+  courseControllers.createCourseWithImage,
+);
 router.get('/getcourses', authenticateUser.verifytoken, courseControllers.getCourses);
 router.get('/getsinglecourse/:id', authenticateUser.verifytoken, courseControllers.getSingleCourse);
 router.get('/paginatedcourses', authenticateUser.verifytoken, courseControllers.paginatedCourses);
 router.delete('/deletecourse/:id', authenticateUser.verifytoken, courseControllers.deleteCourse);
-router.patch('/updatecourse/:id',authenticateUser.verifytoken,upload.single('courseImage'),courseControllers.updateCourse,);
+router.patch(
+  '/updatecourse/:id',
+  authenticateUser.verifytoken,
+  upload.single('courseImage'),
+  courseControllers.updateCourse,
+);
+router.post(
+  '/updatecoursedata/:id',
+  authenticateUser.verifytoken,
+  upload.single('courseImage'),
+  courseControllers.updateCourse,
+);
 
 
+router.get('/recentlyview', authenticateUser.verifytoken, courseControllers.getRecentlyViewedCourses);
 
 /* Exporting the router object. */
 export default router;
+
