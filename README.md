@@ -5,4 +5,4 @@ BACKEND
 
 
 FRONTEND
-1. 
+1. One More UseEffect Added to fetch details of recentView course collections 
