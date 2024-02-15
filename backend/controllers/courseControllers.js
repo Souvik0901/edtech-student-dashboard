@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 const ResponseObjectClass = require('../helpers/ResponseObject');
 const Courses = require('../models/courses');
+
 const newResponseObject = new ResponseObjectClass();
 const RecentlyViewed = require('../models/recentlyviewed');
-
 
 // create a  single course
 const createCourseWithImage = async (req, res) => {
@@ -144,7 +144,7 @@ const getSingleCourse = async (req, res) => {
       );
     }
 
-    const course = await Courses.findById({user_id: userId, _id:id});
+    const course = await Courses.findById({ user_id: userId, _id: id });
 
     if (!course) {
       return res.send(
@@ -156,10 +156,9 @@ const getSingleCourse = async (req, res) => {
         }),
       );
     }
-    
+
     // Store the recently viewed course with timestamp
     await RecentlyViewed.create({ userId, courseId: id, viewedAt: new Date() });
-
 
     return res.send(
       newResponseObject.create({
@@ -180,23 +179,30 @@ const getSingleCourse = async (req, res) => {
   }
 };
 
-
-// API to fetch recently viewed courses within a time range
 const getRecentlyViewedCourses = async (req, res) => {
   const { userId } = req.user;
 
   try {
-    const recentlyViewed = await RecentlyViewed.find({ userId })
-      .sort({ viewedAt: -1 }) // Sort by viewedAt field in descending order
+    const recentlyViewed = await RecentlyViewed.find({ userId });
 
+    // Create a Set to store unique course IDs
+    const uniqueCourseIds = new Set();
 
-    // Fetch details of the recently viewed courses
+    // Filter out duplicate course IDs
+    recentlyViewed.forEach((item) => {
+      uniqueCourseIds.add(item.courseId.toString()); // Convert ObjectId to string for comparison
+    });
+
+    // Fetch details of the recently viewed courses using unique course IDs
     const courses = await Promise.all(
-      recentlyViewed.map(async (item) => {
-        const course = await Courses.findById(item.courseId);
+      Array.from(uniqueCourseIds).map(async (courseId) => {
+        const course = await Courses.findById(courseId);
         return course;
-      })
+      }),
     );
+
+    // Sort courses by purchaseDate in descending order
+    courses.sort((a, b) => new Date(b.purchaseDate) - new Date(a.purchaseDate));
 
     return res.send({
       code: 200,
@@ -331,7 +337,7 @@ const deleteCourse = async (req, res) => {
   }
 };
 
-//update a single  course
+// update a single  course
 const updateCourse = async (req, res) => {
   const { id } = req.params;
   const { userId } = req.user;
@@ -399,11 +405,6 @@ const updateCourse = async (req, res) => {
     );
   }
 };
-
-
-
-
-
 
 module.exports = {
   getSingleCourse,
