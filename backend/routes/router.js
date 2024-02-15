@@ -62,16 +62,12 @@ router.patch(
   upload.single('courseImage'),
   courseControllers.updateCourse,
 );
-router.post(
-  '/updatecoursedata/:id',
+
+router.get(
+  '/recentlyview',
   authenticateUser.verifytoken,
-  upload.single('courseImage'),
-  courseControllers.updateCourse,
+  courseControllers.getRecentlyViewedCourses,
 );
-
-
-router.get('/recentlyview', authenticateUser.verifytoken, courseControllers.getRecentlyViewedCourses);
 
 /* Exporting the router object. */
 export default router;
-
