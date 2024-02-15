@@ -21,24 +21,24 @@ type AccordionState = {
 };
 
 interface Course {
-	id:string;
-	courseImage: string,
-	courseTitle: string;
-	lectures: number;
-	price: number;
-	courseLanguage: string;
-	courseCategory: string;
-	courseLevel: string;
-	purchaseDate: string;
-	user_id: string;
-	_id: string;
+id:string;
+courseImage: string,
+courseTitle: string;
+lectures: number;
+price: number;
+courseLanguage: string;
+courseCategory: string;
+courseLevel: string;
+purchaseDate: string;
+user_id: string;
+_id: string;
 }
 
 interface Instructor{
-	id: string;
-	name: string;
-	email: string;
-	profileImg: string;
+id: string;
+name: string;
+email: string;
+profileImg: string;
 }
 
 
@@ -66,42 +66,44 @@ const CourseDetailsbody = () => {
 
 
 
-	const [courseId, setCourseId] = useState('');
-	const [course, setCourse] = useState<Course | null>(null);
+  const [courseId, setCourseId] = useState('');
+  const [course, setCourse] = useState<Course | null>(null);
   const [user, setUser] = useState<Instructor | null>(null);
+  const [view, setView] = useState<Course[] | null>(null);
 
-	useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        const urlParams = new URLSearchParams(window.location.search);
-        const courseId = urlParams.get('courseId');
-        if (courseId) {
-          const response = await axiosInstance.get(`${SERVICE_URL}getsinglecourse/${courseId}`);
-          setCourse(response.data.data);
-        }
-      }catch (error) {
-        console.error('Error fetching courses:', error);
-      }
-    };
+  useEffect(() => {
+   const fetchData = async () => {
+	try {
+		const urlParams = new URLSearchParams(window.location.search);
+		const courseId = urlParams.get('courseId');	
+	    if (courseId) {
+		const courseResponse = await axiosInstance.get(`${SERVICE_URL}getsinglecourse/${courseId}`);
+		setCourse(courseResponse.data.data);
 
-    fetchCourses();
-    }, []);
+		const userResponse = await axiosInstance.get(`${SERVICE_URL}getsingleuser/${courseResponse.data.data.user_id}`);
+		setUser(userResponse.data.data);
+	    }
 
-
-		useEffect(() => {
-			const fetchUser = async () => {
-				try {
-					if(course){
-						const response = await axiosInstance.get(`${SERVICE_URL}getsingleuser/${course.user_id}`);
-				   	setUser(response.data.data);	
-					}		
-				}catch (error) {
-					console.error('Error fetching courses:', error);
-				}
-			};
+	} catch (error) {
+		console.error('Error fetching data:', error);
+		}
+       };
 	
-			fetchUser();
-		}, [course]);
+   fetchData();
+   }, []);
+	
+  useEffect(() => {
+	const fetchViewData = async () => {
+	  try {
+		const viewResponse = await axiosInstance.get(`${SERVICE_URL}recentlyview`);
+		setView(viewResponse.data.data);
+	   } catch (error) {
+		console.error('Error fetching data:', error);
+	   }
+	 };	
+  fetchViewData();
+ }, []);
+
 
 
   return (
@@ -1416,9 +1418,11 @@ const CourseDetailsbody = () => {
 
 				    {/* CardBody Sidebar */}
 						<div className="col-lg-4 pt-5 pt-lg-0">
-						{course && (
-					  <>
+
 							<div className="row mb-5 mb-lg-0">
+
+							{course && (
+					    <>
 								<div className="col-md-6 col-lg-12">
 							
 									<div className="card shadow p-2 mb-4 z-index-9">
@@ -1510,47 +1514,38 @@ const CourseDetailsbody = () => {
 									</div>
 					
 								</div>
+							</>
+			     	  )}
 
+             <>
+              { view && (
+								
 								<div className="col-md-6 col-lg-12">
 							
 									<div className="card card-body shadow p-4 mb-4">
 										
 										<h4 className="mb-3">Recently Viewed</h4>
-								
-										<div className="row gx-3 mb-3">
+								   
+										{view.map((course) => (
+
+										<div className="row gx-3 mb-3"key={course.id}>
 											
 											<div className="col-4">
-												<Image className="rounded" src={course08} alt=""/>
+												<Image className="rounded" src={`${process.env.NEXT_PUBLIC_BASE_URL}${course.courseImage}`} width={100} height={100} alt=""/>
 											</div>
 										
 											<div className="col-8">
-												<h6 className="mb-0"><a href="#">Fundamentals of Business Analysis</a></h6>
+												<h6 className="mb-0"><a href="#">{course.courseTitle}</a></h6>
 												<ul className="list-group list-group-borderless mt-1 d-flex justify-content-between">
 													<li className="list-group-item px-0 d-flex justify-content-between">
-														<span className="text-success">$130</span>
+														<span className="text-success">${course.price}</span>
 														<span className="list-content-chg">4.5<i className="fas fa-star text-warning ms-1"><FaStar/></i></span>
 													</li>
 												</ul>
 											</div>
 										</div>
-							
-										<div className="row gx-3">
-							
-											<div className="col-4">
-												<Image className="rounded" src={course08} alt=""/>
-											</div>
-										
-											<div className="col-8">
-												<h6 className="mb-0"><a href="#">The Complete Video Production Bootcamp</a></h6>
-												<ul className="list-group list-group-borderless mt-1 d-flex justify-content-between">
-													<li className="list-group-item px-0 d-flex justify-content-between">
-														<span className="text-success">$150</span>
-														<span className="list-content-chg">4.0<i className="fas fa-star text-warning ms-1"><FaStar/></i></span>
-													</li>
-												</ul>
-											</div>
-										</div>
-					
+
+                     ))}
 									</div>
 					
 									<div className="card card-body shadow p-4">
@@ -1568,10 +1563,15 @@ const CourseDetailsbody = () => {
 									</div>	
 									
 								</div>
-							</div>
+                
+							)}
+							</>
 
-						</>
-			     	)}
+
+							</div>
+					
+
+
 						</div>
 
 						
