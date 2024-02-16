@@ -18,7 +18,8 @@ const courseSchema = new Schema({
   period: { type: Number, default: null },
   purchaseDate: { type: Date, default: Date.now },
   videoLink: { type: String, default: null },
-  user_id: { type: mongoose.Schema.Types.ObjectId, required: true },
+  user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'users' },
 });
 
 module.exports = mongoose.model('courses', courseSchema);
+
