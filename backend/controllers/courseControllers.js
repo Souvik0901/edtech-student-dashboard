@@ -1,9 +1,10 @@
 const mongoose = require('mongoose');
-const ResponseObjectClass = require('../helpers/ResponseObject');
 const Courses = require('../models/courses');
-
-const newResponseObject = new ResponseObjectClass();
 const RecentlyViewed = require('../models/recentlyviewed');
+
+const ResponseObjectClass = require('../helpers/ResponseObject');
+const newResponseObject = new ResponseObjectClass();
+
 
 // create a  single course
 const createCourseWithImage = async (req, res) => {
