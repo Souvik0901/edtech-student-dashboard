@@ -145,7 +145,7 @@ const getSingleCourse = async (req, res) => {
       );
     }
 
-    const course = await Courses.findById({ user_id: userId, _id: id });
+    const course = await Courses.findById({ user_id: userId, _id: id }).populate('user_id').exec();
 
     if (!course) {
       return res.send(
@@ -179,6 +179,7 @@ const getSingleCourse = async (req, res) => {
     );
   }
 };
+
 
 // get recently-view courses
 const getRecentlyViewedCourses = async (req, res) => {
