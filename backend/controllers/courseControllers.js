@@ -1,9 +1,10 @@
 const mongoose = require('mongoose');
-const ResponseObjectClass = require('../helpers/ResponseObject');
 const Courses = require('../models/courses');
-
-const newResponseObject = new ResponseObjectClass();
 const RecentlyViewed = require('../models/recentlyviewed');
+
+const ResponseObjectClass = require('../helpers/ResponseObject');
+const newResponseObject = new ResponseObjectClass();
+
 
 // create a  single course
 const createCourseWithImage = async (req, res) => {
@@ -157,8 +158,8 @@ const getSingleCourse = async (req, res) => {
       );
     }
 
-    // Store the recently viewed course with timestamp
-    await RecentlyViewed.create({ userId, courseId: id, viewedAt: new Date() });
+    // Store the recently viewed course 
+    await RecentlyViewed.create({ userId, courseId: id , viewTime: new Date()});
 
     return res.send(
       newResponseObject.create({
@@ -179,18 +180,22 @@ const getSingleCourse = async (req, res) => {
   }
 };
 
+// get recently-view courses
 const getRecentlyViewedCourses = async (req, res) => {
   const { userId } = req.user;
 
   try {
     const recentlyViewed = await RecentlyViewed.find({ userId });
+    
+    // Sort recently viewed courses by viewTime in descending order
+    recentlyViewed.sort((a, b) => b.viewTime - a.viewTime);
 
     // Create a Set to store unique course IDs
     const uniqueCourseIds = new Set();
 
     // Filter out duplicate course IDs
     recentlyViewed.forEach((item) => {
-      uniqueCourseIds.add(item.courseId.toString()); // Convert ObjectId to string for comparison
+      uniqueCourseIds.add(item.courseId.toString()); 
     });
 
     // Fetch details of the recently viewed courses using unique course IDs
@@ -200,9 +205,6 @@ const getRecentlyViewedCourses = async (req, res) => {
         return course;
       }),
     );
-
-    // Sort courses by purchaseDate in descending order
-    courses.sort((a, b) => new Date(b.purchaseDate) - new Date(a.purchaseDate));
 
     return res.send({
       code: 200,
@@ -219,6 +221,31 @@ const getRecentlyViewedCourses = async (req, res) => {
     });
   }
 };
+
+// clear all recently-view courses
+const clearAllViewedCourses = async (req, res) => {
+  const { userId } = req.user;
+
+  try {
+    // Delete all recently viewed courses for the user
+    await RecentlyViewed.deleteMany({ userId });
+
+    return res.send({
+      code: 200,
+      success: true,
+      message: 'All viewed courses cleared successfully',
+      data: {},
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      code: 500,
+      success: false,
+      message: 'Internal server error',
+    });
+  }
+};
+
 
 // get all paginated courses
 const paginatedCourses = async (req, res) => {
@@ -407,12 +434,13 @@ const updateCourse = async (req, res) => {
 };
 
 module.exports = {
-  getSingleCourse,
+  createCourseWithImage,
   paginatedCourses,
   deleteCourse,
   updateCourse,
-  createCourseWithImage,
   getCourses,
+  getSingleCourse,
   getRecentlyViewedCourses,
+  clearAllViewedCourses
 };
 

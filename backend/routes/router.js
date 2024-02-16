@@ -63,11 +63,9 @@ router.patch(
   courseControllers.updateCourse,
 );
 
-router.get(
-  '/recentlyview',
-  authenticateUser.verifytoken,
-  courseControllers.getRecentlyViewedCourses,
-);
+router.get('/recentlyview',authenticateUser.verifytoken,courseControllers.getRecentlyViewedCourses,);
+router.delete('/clearrecentlyview',authenticateUser.verifytoken, courseControllers.clearAllViewedCourses,);
+
 
 /* Exporting the router object. */
 export default router;
