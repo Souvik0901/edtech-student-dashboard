@@ -1,6 +1,6 @@
 BACKEND
-1. populate added on getsinglecourse middleware
-2. courses schena modifed with user_Id refers from user
+1. timestamp added for recently view courses fetch
+2. recentlyviewed schema modifed with courseId refers from courses
 
 
 
