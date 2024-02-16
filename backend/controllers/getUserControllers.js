@@ -36,52 +36,5 @@ const getUser = async (req, res) => {
   }
 };
 
-// get a Single user details with help of USERID
-const getSingleUser = async (req, res) => {
-  const { id } = req.params;
 
-  try {
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.send(
-        newResponseObject.create({
-          code: 200,
-          success: false,
-          message: 'No valid user',
-          data: {},
-        }),
-      );
-    }
-
-    const user = await Users.findById(id);
-
-    if (!user) {
-      return res.send(
-        newResponseObject.create({
-          code: 200,
-          success: false,
-          message: 'No user found',
-          data: {},
-        }),
-      );
-    }
-
-    return res.send(
-      newResponseObject.create({
-        code: 200,
-        success: true,
-        message: 'showing user details',
-        data: user,
-      }),
-    );
-  } catch (error) {
-    return res.send(
-      newResponseObject.create({
-        code: 500,
-        success: false,
-        message: 'internal server error',
-      }),
-    );
-  }
-};
-
-module.exports = { getUser, getSingleUser };
+module.exports = { getUser, };
