@@ -179,6 +179,7 @@ const getSingleCourse = async (req, res) => {
   }
 };
 
+// get recently-view courses
 const getRecentlyViewedCourses = async (req, res) => {
   const { userId } = req.user;
 
@@ -220,7 +221,7 @@ const getRecentlyViewedCourses = async (req, res) => {
   }
 };
 
-
+// clear all recently-view courses
 const clearAllViewedCourses = async (req, res) => {
   const { userId } = req.user;
 
