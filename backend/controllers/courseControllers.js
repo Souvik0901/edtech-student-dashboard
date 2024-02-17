@@ -128,6 +128,7 @@ const getCourses = async (req, res) => {
   }
 };
 
+
 // get single course
 const getSingleCourse = async (req, res) => {
   const { userId } = req.user;
