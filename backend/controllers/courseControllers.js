@@ -129,6 +129,7 @@ const getCourses = async (req, res) => {
   }
 };
 
+
 // get single course
 const getSingleCourse = async (req, res) => {
   const { userId } = req.user;
@@ -158,15 +159,18 @@ const getSingleCourse = async (req, res) => {
       );
     }
 
-    // Store the recently viewed course 
-    let recentlyViewedCourse = await RecentlyViewed.findOne({ userId, courseId: id });
+ // Store the recently viewed course 
+    let recentlyViewedCourse = await RecentlyViewed.findOneAndUpdate(
+      { userId, courseId: id },
+      { 
+        $set: { 
+          updatedAt: new Date(),
+          createdAt: { $cond: [{ $eq: ["$createdAt", null] }, new Date(), "$createdAt"] }
+        } 
+      },
+      { upsert: true, new: true }
+    );
 
-    if (!recentlyViewedCourse) {
-      recentlyViewedCourse = await RecentlyViewed.create({ userId, courseId: id });
-    } else {
-      recentlyViewedCourse.updatedAt = new Date();
-      await recentlyViewedCourse.save();
-    }
  
     return res.send(
       newResponseObject.create({
@@ -209,6 +213,7 @@ const getRecentlyViewedCourses = async (req, res) => {
     });
   }
 };
+
 
 // clear all recently-view courses
 const clearAllViewedCourses = async (req, res) => {
