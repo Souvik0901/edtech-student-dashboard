@@ -159,8 +159,15 @@ const getSingleCourse = async (req, res) => {
     }
 
     // Store the recently viewed course 
-    await RecentlyViewed.create({ userId, courseId: id , viewTime: new Date()});
+    let recentlyViewedCourse = await RecentlyViewed.findOne({ userId, courseId: id });
 
+    if (!recentlyViewedCourse) {
+      recentlyViewedCourse = await RecentlyViewed.create({ userId, courseId: id });
+    } else {
+      recentlyViewedCourse.updatedAt = new Date();
+      await recentlyViewedCourse.save();
+    }
+ 
     return res.send(
       newResponseObject.create({
         code: 200,
@@ -180,38 +187,18 @@ const getSingleCourse = async (req, res) => {
   }
 };
 
-
-// get recently-view courses
+// get recently viewed courses
 const getRecentlyViewedCourses = async (req, res) => {
   const { userId } = req.user;
 
   try {
-    const recentlyViewed = await RecentlyViewed.find({ userId });
-    
-    // Sort recently viewed courses by viewTime in descending order
-    recentlyViewed.sort((a, b) => b.viewTime - a.viewTime);
-
-    // Create a Set to store unique course IDs
-    const uniqueCourseIds = new Set();
-
-    // Filter out duplicate course IDs
-    recentlyViewed.forEach((item) => {
-      uniqueCourseIds.add(item.courseId.toString()); 
-    });
-
-    // Fetch details of the recently viewed courses using unique course IDs
-    const courses = await Promise.all(
-      Array.from(uniqueCourseIds).map(async (courseId) => {
-        const course = await Courses.findById(courseId);
-        return course;
-      }),
-    );
+    const recentlyViewed = await RecentlyViewed.find({ userId }).sort({ updatedAt: -1 }).populate('courseId').exec();
 
     return res.send({
       code: 200,
       success: true,
       message: 'Showing recently viewed courses',
-      data: courses,
+      data: recentlyViewed, 
     });
   } catch (error) {
     console.error(error);
