@@ -5,7 +5,6 @@ const RecentlyViewed = require('../models/recentlyviewed');
 const ResponseObjectClass = require('../helpers/ResponseObject');
 const newResponseObject = new ResponseObjectClass();
 
-
 // create a  single course
 const createCourseWithImage = async (req, res) => {
   try {
@@ -196,7 +195,11 @@ const getRecentlyViewedCourses = async (req, res) => {
   const { userId } = req.user;
 
   try {
-    const recentlyViewed = await RecentlyViewed.find({ userId }).sort({ updatedAt: -1 }).populate('courseId').exec();
+    const recentlyViewed = await RecentlyViewed.find({ userId })
+    .sort({ updatedAt: -1 })
+    .limit(5)
+    .populate('courseId')
+    .exec();
 
     return res.send({
       code: 200,
@@ -213,32 +216,6 @@ const getRecentlyViewedCourses = async (req, res) => {
     });
   }
 };
-
-
-// clear all recently-view courses
-const clearAllViewedCourses = async (req, res) => {
-  const { userId } = req.user;
-
-  try {
-    // Delete all recently viewed courses for the user
-    await RecentlyViewed.deleteMany({ userId });
-
-    return res.send({
-      code: 200,
-      success: true,
-      message: 'All viewed courses cleared successfully',
-      data: {},
-    });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      code: 500,
-      success: false,
-      message: 'Internal server error',
-    });
-  }
-};
-
 
 // get all paginated courses
 const paginatedCourses = async (req, res) => {
@@ -426,6 +403,31 @@ const updateCourse = async (req, res) => {
   }
 };
 
+// clear all recently-view courses
+const clearAllViewedCourses = async (req, res) => {
+  const { userId } = req.user;
+
+  try {
+    // Delete all recently viewed courses for the user
+    await RecentlyViewed.deleteMany({ userId });
+
+    return res.send({
+      code: 200,
+      success: true,
+      message: 'All viewed courses cleared successfully',
+      data: {},
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      code: 500,
+      success: false,
+      message: 'Internal server error',
+    });
+  }
+};
+
+
 module.exports = {
   createCourseWithImage,
   paginatedCourses,
@@ -436,4 +438,5 @@ module.exports = {
   getRecentlyViewedCourses,
   clearAllViewedCourses
 };
+
 

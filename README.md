@@ -33,4 +33,4 @@ This entire operation updates the recentlyViewedCourse document in the RecentlyV
 
 
 FRONTEND
-1. No More Changes
+1. changes on fetching the details of viwed courses.
