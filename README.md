@@ -1,7 +1,7 @@
 BACKEND
-cartControllers Added.
+1.cartControllers Added.
 
 
 
 FRONTEND
-1. changes on fetching the details of viwed courses.
+1. add to cart api called
