@@ -5,12 +5,13 @@ import avatar from '../../components/assets/images/avatar/09.jpg'
 
 import { axiosInstance } from '@/redux/interceptors';
 import { SERVICE_URL } from '@/utils/endpoint';
-
+import { useRouter } from 'next/navigation';
 import { FaRegCheckCircle, FaFacebook, FaTwitter, FaInstagram,
-	       FaLinkedin, FaYoutube, FaStar, FaPlay, FaUserGraduate,
-				 FaStarHalfAlt, FaRegStar, FaRegThumbsUp, FaRegThumbsDown, 
-				 FaBookOpen, FaClock, FaSignal, FaGlobe, FaMedal, FaUserClock} from "react-icons/fa";
+       FaLinkedin, FaYoutube, FaStar, FaPlay, FaUserGraduate,
+       FaStarHalfAlt, FaRegStar, FaRegThumbsUp, FaRegThumbsDown, 
+       FaBookOpen, FaClock, FaSignal, FaGlobe, FaMedal, FaUserClock} from "react-icons/fa";
 import { AiOutlineMessage } from "react-icons/ai";
+import Cookies from 'js-cookie';
 
 type AccordionState = {
   collapseOne: boolean;
@@ -21,45 +22,47 @@ type AccordionState = {
 };
 
 interface Course {
-	id:string;
-	courseImage: string,
-	courseTitle: string;
-	lectures: number;
-	price: number;
-	courseLanguage: string;
-	courseCategory: string;
-	courseLevel: string;
-	purchaseDate: string;
-	user_id:{
-	 name: string;
-	 email: string;
-	 profileImg: string;
-	 abouttxt: string;
-	};
-	_id: string;
+id:string;
+courseImage: string,
+courseTitle: string;
+lectures: number;
+price: number;
+courseLanguage: string;
+courseCategory: string;
+courseLevel: string;
+purchaseDate: string;
+user_id:{
+ name: string;
+ email: string;
+ profileImg: string;
+ abouttxt: string;
+};
+_id: string;
 }
 
 interface View {
-	map(arg0: (item: any) => React.JSX.Element): unknown;
-	id:string;
-	courseId: {
-	_id:string;
-	courseImage: string,
-	courseTitle: string;
-	lectures: number;
-	price: number;
-	courseLanguage: string;
-	courseCategory: string;
-	courseLevel: string;
-	purchaseDate: string;
-	}
-	userId: string;
-	_id: string;
+map(arg0: (item: any) => React.JSX.Element): unknown;
+id:string;
+courseId: {
+_id:string;
+courseImage: string,
+courseTitle: string;
+lectures: number;
+price: number;
+courseLanguage: string;
+courseCategory: string;
+courseLevel: string;
+purchaseDate: string;
+}
+userId: string;
+_id: string;
 }
 
 
 const CourseDetailsbody = () => {
-
+  
+const router = useRouter();
+const user = Cookies.get('token');
   const [activeStep, setActiveStep] = useState('Overview');
   const [accordionOpen, setAccordionOpen] = useState<AccordionState>({
     collapseOne: false,
@@ -88,8 +91,8 @@ const [view, setView] = useState<View | null>(null);
 
 
   useEffect(() => {
-	const fetchData = async () => {
-		try {
+       const fetchData = async () => {
+	try {
 		const urlParams = new URLSearchParams(window.location.search);
 		const courseId = urlParams.get('courseId');
 		
@@ -98,19 +101,19 @@ const [view, setView] = useState<View | null>(null);
 		setCourse(courseResponse.data.data);	
 		}
 
-		} catch (error) {
-			console.error('Error fetching data:', error);
-		}
+	} catch (error) {
+		console.error('Error fetching data:', error);
+	}
 	};
 
 	const fetchViewData = async () => {
-		try {
+	try {
 		const viewResponse = await axiosInstance.get(`${SERVICE_URL}recentlyview`);
 		console.log('View Response:', viewResponse.data.data);
 		setView(viewResponse.data.data);  
-		} catch (error) {
+	} catch (error) {
 		console.error('Error fetching data:', error);
-		}
+	}
 	};
 
 	
@@ -119,6 +122,32 @@ const [view, setView] = useState<View | null>(null);
 	}, []);
 	
 
+    const handleSubmit = async(e: { preventDefault: () => void; })=>{
+	e.preventDefault();
+
+	const urlParams = new URLSearchParams(window.location.search);
+	const courseId = urlParams.get('courseId');
+
+	// Make a POST request using axios
+	const response = await axiosInstance.post(`${SERVICE_URL}addtocart`, 
+	{courseId},
+	{
+	headers: {
+	'Content-Type': 'application/json',
+	Accept: 'application/json',
+	Authorization: user 
+	},
+	}
+	);
+
+	console.log(response.data);
+
+	const responseData = response.data;
+	if(responseData.success){
+		router.push('/cart');
+	}
+			
+	}
 
   return (
 
@@ -1482,7 +1511,7 @@ const [view, setView] = useState<View | null>(null);
 										
 											<div className="mt-3 d-sm-flex justify-content-sm-between">
 												<a href="#" className="btn btn-outline-primary mb-0">Free trial</a>
-												<a href="#" className="btn btn-success mb-0">Buy course</a>
+												<a href="#" className="btn btn-success mb-0" onClick={handleSubmit}>Buy course</a>
 											</div>
 										</div>
 									</div>
