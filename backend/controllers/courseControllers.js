@@ -1,18 +1,34 @@
+const AWS = require('aws-sdk');
+const { v4 } = require('uuid');
 const mongoose = require('mongoose');
 const Courses = require('../models/courses');
 const RecentlyViewed = require('../models/recentlyviewed');
-
 const ResponseObjectClass = require('../helpers/ResponseObject');
+
 const newResponseObject = new ResponseObjectClass();
+
+const s3 = new AWS.S3({
+  accessKeyId: process.env.AWS_ACCESS_KEY,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  region: process.env.AWS_BUCKET_REGION,
+});
 
 // create a  single course
 const createCourseWithImage = async (req, res) => {
   try {
     if (req.file) {
-      const imageUrl = `/node/api/core/images/${req.file.filename}`;
+      const { file } = req;
+      const filename = `${v4()}_${file.originalname}`;
+      const params = {
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: filename,
+        Body: file.buffer,
+        ContentType: file.mimetype,
+      };
+      const uploadResult = await s3.upload(params).promise();
 
       const course = new Courses({
-        courseImage: imageUrl,
+        courseImage: uploadResult.Location,
         courseTitle: req.body.courseTitle,
         shortDescrp: req.body.shortDescrp,
         longDescrp: req.body.longDescrp,
@@ -128,7 +144,6 @@ const getCourses = async (req, res) => {
   }
 };
 
-
 // get single course
 const getSingleCourse = async (req, res) => {
   const { userId } = req.user;
@@ -158,25 +173,25 @@ const getSingleCourse = async (req, res) => {
       );
     }
 
- // Store the recently viewed course 
-    let recentlyViewedCourse = await RecentlyViewed.findOneAndUpdate(
+    // Store the recently viewed course
+    const recentlyViewedCourse = await RecentlyViewed.findOneAndUpdate(
       { userId, courseId: id },
-      { 
-        $set: { 
+      {
+        $set: {
           updatedAt: new Date(),
-          createdAt: { $cond: [{ $eq: ["$createdAt", null] }, new Date(), "$createdAt"] }
-        } 
+          createdAt: { $cond: [{ $eq: ['$createdAt', null] }, new Date(), '$createdAt'] },
+        },
       },
-      { upsert: true, new: true }
+      { upsert: true, new: true },
     );
 
- 
     return res.send(
       newResponseObject.create({
         code: 200,
         success: true,
         message: 'showing course details',
         data: course,
+        viewdata: recentlyViewedCourse,
       }),
     );
   } catch (error) {
@@ -196,16 +211,16 @@ const getRecentlyViewedCourses = async (req, res) => {
 
   try {
     const recentlyViewed = await RecentlyViewed.find({ userId })
-    .sort({ updatedAt: -1 })
-    .limit(5)
-    .populate('courseId')
-    .exec();
+      .sort({ updatedAt: -1 })
+      .limit(5)
+      .populate('courseId')
+      .exec();
 
     return res.send({
       code: 200,
       success: true,
       message: 'Showing recently viewed courses',
-      data: recentlyViewed, 
+      data: recentlyViewed,
     });
   } catch (error) {
     console.error(error);
@@ -378,7 +393,16 @@ const updateCourse = async (req, res) => {
 
     // Check if an image is being uploaded
     if (req.file) {
-      existingCourse.courseImage = `/node/api/core/images/${req.file.filename}`;
+      const { file } = req;
+      const filename = `${v4()}_${file.originalname}`;
+      const params = {
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: filename,
+        Body: file.buffer,
+        ContentType: file.mimetype,
+      };
+      const uploadResult = await s3.upload(params).promise();
+      existingCourse.courseImage = uploadResult.Location;
     }
 
     // Save the updated course
@@ -403,31 +427,6 @@ const updateCourse = async (req, res) => {
   }
 };
 
-// clear all recently-view courses
-const clearAllViewedCourses = async (req, res) => {
-  const { userId } = req.user;
-
-  try {
-    // Delete all recently viewed courses for the user
-    await RecentlyViewed.deleteMany({ userId });
-
-    return res.send({
-      code: 200,
-      success: true,
-      message: 'All viewed courses cleared successfully',
-      data: {},
-    });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      code: 500,
-      success: false,
-      message: 'Internal server error',
-    });
-  }
-};
-
-
 module.exports = {
   createCourseWithImage,
   paginatedCourses,
@@ -436,7 +435,5 @@ module.exports = {
   getCourses,
   getSingleCourse,
   getRecentlyViewedCourses,
-  clearAllViewedCourses
 };
-
 
