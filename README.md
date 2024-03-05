@@ -1,7 +1,7 @@
 BACKEND
-1. cartControllers Added
+1. Image Uploaded on AWS
 
 
 
 FRONTEND
-1. add to cart api called
+1. No Changes  here
