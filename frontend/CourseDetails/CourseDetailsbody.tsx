@@ -7,9 +7,9 @@ import { axiosInstance } from '@/redux/interceptors';
 import { SERVICE_URL } from '@/utils/endpoint';
 import { useRouter } from 'next/navigation';
 import { FaRegCheckCircle, FaFacebook, FaTwitter, FaInstagram,
-       FaLinkedin, FaYoutube, FaStar, FaPlay, FaUserGraduate,
-       FaStarHalfAlt, FaRegStar, FaRegThumbsUp, FaRegThumbsDown, 
-       FaBookOpen, FaClock, FaSignal, FaGlobe, FaMedal, FaUserClock} from "react-icons/fa";
+	 FaLinkedin, FaYoutube, FaStar, FaPlay, FaUserGraduate,
+	 FaStarHalfAlt, FaRegStar, FaRegThumbsUp, FaRegThumbsDown, 
+	 FaBookOpen, FaClock, FaSignal, FaGlobe, FaMedal, FaUserClock} from "react-icons/fa";
 import { AiOutlineMessage } from "react-icons/ai";
 import Cookies from 'js-cookie';
 
@@ -22,47 +22,47 @@ type AccordionState = {
 };
 
 interface Course {
-id:string;
-courseImage: string,
-courseTitle: string;
-lectures: number;
-price: number;
-courseLanguage: string;
-courseCategory: string;
-courseLevel: string;
-purchaseDate: string;
-user_id:{
- name: string;
- email: string;
- profileImg: string;
- abouttxt: string;
-};
-_id: string;
+	id:string;
+	courseImage: string,
+	courseTitle: string;
+	lectures: number;
+	price: number;
+	courseLanguage: string;
+	courseCategory: string;
+	courseLevel: string;
+	purchaseDate: string;
+	user_id:{
+	 name: string;
+	 email: string;
+	 profileImg: string;
+	 abouttxt: string;
+	};
+	_id: string;
 }
 
 interface View {
-map(arg0: (item: any) => React.JSX.Element): unknown;
-id:string;
-courseId: {
-_id:string;
-courseImage: string,
-courseTitle: string;
-lectures: number;
-price: number;
-courseLanguage: string;
-courseCategory: string;
-courseLevel: string;
-purchaseDate: string;
-}
-userId: string;
-_id: string;
+	map(arg0: (item: any) => React.JSX.Element): unknown;
+	id:string;
+	courseId: {
+	_id:string;
+	courseImage: string,
+	courseTitle: string;
+	lectures: number;
+	price: number;
+	courseLanguage: string;
+	courseCategory: string;
+	courseLevel: string;
+	purchaseDate: string;
+	}
+	userId: string;
+	_id: string;
 }
 
 
 const CourseDetailsbody = () => {
   
-const router = useRouter();
-const user = Cookies.get('token');
+  const router = useRouter();
+  const user = Cookies.get('token');
   const [activeStep, setActiveStep] = useState('Overview');
   const [accordionOpen, setAccordionOpen] = useState<AccordionState>({
     collapseOne: false,
@@ -91,61 +91,61 @@ const [view, setView] = useState<View | null>(null);
 
 
   useEffect(() => {
-       const fetchData = async () => {
-	try {
-		const urlParams = new URLSearchParams(window.location.search);
-		const courseId = urlParams.get('courseId');
-		
-		if (courseId) {
-		const courseResponse = await axiosInstance.get(`${SERVICE_URL}getsinglecourse/${courseId}`);
-		setCourse(courseResponse.data.data);	
-		}
+		const fetchData = async () => {
+			try {
+				const urlParams = new URLSearchParams(window.location.search);
+				const courseId = urlParams.get('courseId');
+				
+				if (courseId) {
+					const courseResponse = await axiosInstance.get(`${SERVICE_URL}getsinglecourse/${courseId}`);
+					setCourse(courseResponse.data.data);	
+				}
 
-	} catch (error) {
-		console.error('Error fetching data:', error);
-	}
-	};
+			} catch (error) {
+				console.error('Error fetching data:', error);
+			}
+		};
 
-	const fetchViewData = async () => {
-	try {
-		const viewResponse = await axiosInstance.get(`${SERVICE_URL}recentlyview`);
-		console.log('View Response:', viewResponse.data.data);
-		setView(viewResponse.data.data);  
-	} catch (error) {
-		console.error('Error fetching data:', error);
-	}
+		const fetchViewData = async () => {
+			try {
+				const viewResponse = await axiosInstance.get(`${SERVICE_URL}recentlyview`);
+				console.log('View Response:', viewResponse.data.data);
+				setView(viewResponse.data.data);  
+			} catch (error) {
+				console.error('Error fetching data:', error);
+			}
 	};
 
 	
-	fetchData();
-	fetchViewData();
+		fetchData();
+		fetchViewData();
 	}, []);
 	
 
-    const handleSubmit = async(e: { preventDefault: () => void; })=>{
-	e.preventDefault();
+	const handleSubmit = async(e: { preventDefault: () => void; })=>{
+		e.preventDefault();
 
-	const urlParams = new URLSearchParams(window.location.search);
-	const courseId = urlParams.get('courseId');
+    const urlParams = new URLSearchParams(window.location.search);
+		const courseId = urlParams.get('courseId');
+   
+		// Make a POST request using axios
+		const response = await axiosInstance.post(`${SERVICE_URL}addtocart`, 
+			{courseId},
+			{
+				headers: {
+					'Content-Type': 'application/json',
+					Accept: 'application/json',
+					Authorization: user 
+				},
+			}
+		);
 
-	// Make a POST request using axios
-	const response = await axiosInstance.post(`${SERVICE_URL}addtocart`, 
-	{courseId},
-	{
-	headers: {
-	'Content-Type': 'application/json',
-	Accept: 'application/json',
-	Authorization: user 
-	},
-	}
-	);
+		console.log(response.data);
 
-	console.log(response.data);
-
-	const responseData = response.data;
-	if(responseData.success){
-		router.push('/cart');
-	}
+		const responseData = response.data;
+		if(responseData.success){
+			router.push('/cart');
+		}
 			
 	}
 
@@ -945,7 +945,7 @@ const [view, setView] = useState<View | null>(null);
 														<div className="row g-0 align-items-center">
 															<div className="col-md-5">
 															
-																<Image src={`${process.env.NEXT_PUBLIC_BASE_URL}${course.user_id.profileImg}`} width={100} height={100}  className="img-fluid rounded-3" alt="instructor-image"/>
+																<Image src={`${course.user_id.profileImg}`} width={100} height={100}  className="img-fluid rounded-3" alt="instructor-image"/>
 															</div>
 															<div className="col-md-7">
 															
@@ -1195,7 +1195,7 @@ const [view, setView] = useState<View | null>(null);
 												<div className="d-md-flex mb-4 ps-4 ps-md-5">
 										
 													<div className="avatar avatar-lg me-4 flex-shrink-0">
-														<Image className="avatar-img rounded-circle" src={`${process.env.NEXT_PUBLIC_BASE_URL}${course.user_id.profileImg}`} width={100} height={100}  alt="avatar"/>
+														<Image className="avatar-img rounded-circle" src={`${course.user_id.profileImg}`} width={100} height={100}  alt="avatar"/>
 													</div>
 												
 													<div>
@@ -1465,7 +1465,7 @@ const [view, setView] = useState<View | null>(null);
 							
 									<div className="card shadow p-2 mb-4 z-index-9">
 										<div className="overflow-hidden rounded-3">
-											<Image src={`${process.env.NEXT_PUBLIC_BASE_URL}${course.courseImage}`} width={100} height={100} className="card-img" alt="course image"/>
+											<Image src={`${course.courseImage}`} width={100} height={100} className="card-img" alt="course image"/>
 										
 											<div className="bg-overlay bg-dark opacity-6"></div>
 											<div className="card-img-overlay d-flex align-items-start flex-column p-3">
@@ -1571,7 +1571,7 @@ const [view, setView] = useState<View | null>(null);
 										<div className="row gx-3 mb-3" key={item._id}>
 											
 											<div className="col-4">
-												<Image className="rounded" src={`${process.env.NEXT_PUBLIC_BASE_URL}${item.courseId.courseImage}`} width={100} height={100} alt=""/>
+												<Image className="rounded" src={`${item.courseId.courseImage}`} width={100} height={100} alt=""/>
 											</div>
 										
 											<div className="col-8">
