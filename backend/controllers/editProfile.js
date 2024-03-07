@@ -1,16 +1,10 @@
-const AWS = require('aws-sdk');
-const { v4 } = require('uuid');
 const bcrypt = require('bcryptjs');
 const ResponseObjectClass = require('../helpers/ResponseObject');
-
 const newResponseObject = new ResponseObjectClass();
 const Users = require('../models/user');
+const { uploadFileToS3 } = require('../helpers/s3Client');
 
-const s3 = new AWS.S3({
-  accessKeyId: process.env.AWS_ACCESS_KEY,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  region: process.env.AWS_BUCKET_REGION,
-});
+
 
 const changePassword = async (req, res) => {
   try {
@@ -64,14 +58,7 @@ const changeUserdata = async (req, res) => {
     console.log(userId);
     const { username, emailId, phoneNumber, location, abouttxt } = req.body;
     const { file } = req;
-    const filename = `${v4()}_${file.originalname}`;
-    const params = {
-      Bucket: process.env.AWS_BUCKET_NAME,
-      Key: filename,
-      Body: file.buffer,
-      ContentType: file.mimetype,
-    };
-    const uploadResult = await s3.upload(params).promise();
+    const imageUrl = await uploadFileToS3(file);
 
     const result = await Users.updateOne(
       { _id: userId },
@@ -79,7 +66,7 @@ const changeUserdata = async (req, res) => {
         $set: {
           name: username,
           email: emailId,
-          profileImg: uploadResult.Location,
+          profileImg: imageUrl,
           phoneNumber,
           location,
           abouttxt,

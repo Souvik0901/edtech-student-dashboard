@@ -1,7 +1,7 @@
 BACKEND
-1. Image Uploaded on AWS
+1. AWS Images And Files are uploaded successfully.
 
 
 
 FRONTEND
-1. No Changes  here
+1. Completed one Poryion of AWS 

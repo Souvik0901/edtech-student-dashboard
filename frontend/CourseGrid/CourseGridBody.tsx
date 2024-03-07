@@ -141,7 +141,7 @@ const CourseGridBody = () => {
               <div className="col-sm-6 col-xl-4" key={course.id} >
                 <div className="card shadow h-100">
 
-                  <Image src={`${process.env.NEXT_PUBLIC_BASE_URL}${course.courseImage}`} width={100} height={100} className="card-img-top" alt="course image"/>
+                  <Image src={`${course.courseImage}`} width={100} height={100} className="card-img-top" alt="course image"/>
 
                   <div className="card-body pb-0">
 
