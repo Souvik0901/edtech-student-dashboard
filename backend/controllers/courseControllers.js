@@ -1,5 +1,3 @@
-const AWS = require('aws-sdk');
-const { v4 } = require('uuid');
 const mongoose = require('mongoose');
 const Courses = require('../models/courses');
 const RecentlyViewed = require('../models/recentlyviewed');
@@ -7,28 +5,17 @@ const ResponseObjectClass = require('../helpers/ResponseObject');
 
 const newResponseObject = new ResponseObjectClass();
 
-const s3 = new AWS.S3({
-  accessKeyId: process.env.AWS_ACCESS_KEY,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  region: process.env.AWS_BUCKET_REGION,
-});
+const { uploadFileToS3 } = require('../helpers/s3Client');
 
 // create a  single course
 const createCourseWithImage = async (req, res) => {
   try {
     if (req.file) {
       const { file } = req;
-      const filename = `${v4()}_${file.originalname}`;
-      const params = {
-        Bucket: process.env.AWS_BUCKET_NAME,
-        Key: filename,
-        Body: file.buffer,
-        ContentType: file.mimetype,
-      };
-      const uploadResult = await s3.upload(params).promise();
+      const imageUrl = await uploadFileToS3(file);
 
       const course = new Courses({
-        courseImage: uploadResult.Location,
+        courseImage: imageUrl,
         courseTitle: req.body.courseTitle,
         shortDescrp: req.body.shortDescrp,
         longDescrp: req.body.longDescrp,
@@ -394,15 +381,8 @@ const updateCourse = async (req, res) => {
     // Check if an image is being uploaded
     if (req.file) {
       const { file } = req;
-      const filename = `${v4()}_${file.originalname}`;
-      const params = {
-        Bucket: process.env.AWS_BUCKET_NAME,
-        Key: filename,
-        Body: file.buffer,
-        ContentType: file.mimetype,
-      };
-      const uploadResult = await s3.upload(params).promise();
-      existingCourse.courseImage = uploadResult.Location;
+      const imageUrl = await uploadFileToS3(file);
+      existingCourse.courseImage = imageUrl;
     }
 
     // Save the updated course
