@@ -12,6 +12,7 @@ import deleteAccount from '../controllers/deleteAccount';
 import enrollmentList from '../controllers/enrollmentList';
 import cartControllers from '../controllers/cartControllers';
 import orderControllers from '../controllers/orderControllers';
+import wishControllers from '../controllers/wishControllers';
 
 /* Importing the functions from middleware files. */
 import authenticateUser from '../middleware/authenticateUser';
@@ -64,12 +65,11 @@ router.patch(
   upload.single('courseImage'),
   courseControllers.updateCourse,
 );
+router.get('/recentlyview',authenticateUser.verifytoken,courseControllers.getRecentlyViewedCourses,);
 
-router.get(
-  '/recentlyview',
-  authenticateUser.verifytoken,
-  courseControllers.getRecentlyViewedCourses,
-);
+router.post('/likedcourse', authenticateUser.verifytoken, wishControllers.createLikedCourse,);
+router.get('/getlikedcourses', authenticateUser.verifytoken, wishControllers.getWishlistCourses,);
+router.delete('/clearwishlisted', authenticateUser.verifytoken, wishControllers.clearWishlist);
 
 /* Exporting the router object. */
 export default router;
