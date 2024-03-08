@@ -1,7 +1,7 @@
 BACKEND
-1. AWS Images And Files are uploaded successfully.
+1. Wishlist Backend API Function Added for stored The liked course collections 
 
 
 
 FRONTEND
-1. Completed one Poryion of AWS 
+1. 
