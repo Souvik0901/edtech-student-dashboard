@@ -3,13 +3,13 @@ import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { RiArrowDropLeftLine, RiArrowDropRightLine } from "react-icons/ri";
 import { FiClock } from "react-icons/fi";
-import { FaHeart, FaRegHeart } from "react-icons/fa";
+import { FaRegHeart, FaHeart } from "react-icons/fa";
 import { IoMdStar,IoMdStarHalf } from "react-icons/io";
 import { AiOutlineSchedule } from "react-icons/ai";
 import { FaSearch } from "react-icons/fa";
 import { axiosInstance } from '@/redux/interceptors';
 import { SERVICE_URL } from '@/utils/endpoint';
-
+import Cookies from 'js-cookie';
 
 interface course {
   id:string;
@@ -26,7 +26,7 @@ interface course {
 
 
 const CourseGridBody = () => {
-
+  const user = Cookies.get('token');
   const [courses, setCourses] = useState<course[]>([]);
 
   const [search, setSearch] = useState<string>('');
@@ -34,7 +34,6 @@ const CourseGridBody = () => {
   const [pageCount, setPageCount] = useState<number>(1);
   const [selectedskills, setSelectedskills] = useState<string[]>([]);
   const [selectedlanguages, setSelectedlanguages] = useState<string[]>([]);
-  const [likedCourse, setLikedCourse] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -83,19 +82,30 @@ const CourseGridBody = () => {
       );
     };
 
-
-    const handleLikeToggle = (courseId: string) => {
-      setLikedCourse((prevLikedCourses) =>
-        prevLikedCourses.includes(courseId)
-          ? prevLikedCourses.filter((id) => id !== courseId)
-          : [...prevLikedCourses, courseId]
-      );
+    const handleLikeCourse = async (courseId: string) => {
+      try {
+        // Make a POST request to the API endpoint to add/remove the course from the wishlist
+        const response = await axiosInstance.post(`${SERVICE_URL}likedcourse`, { courseId }, {
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+            Authorization: user 
+          },
+        });
+    
+        // Handle the response data if needed
+        const responseData = response.data;
+    
+      } catch (error) {
+        console.error('Error liking course:', error);
+      }
     };
+    
+    
+    
 
 
 
-
-  
   return (
     <div>
 
@@ -161,8 +171,8 @@ const CourseGridBody = () => {
 
                     <div className="d-flex justify-content-between mb-2">
                       <a href="#" className="badge bg-purple bg-opacity-10 text-purple">{course.courseLevel}</a>
-                      <a href="#" className="text-danger" onClick={() => handleLikeToggle(course.id)}>
-                           {likedCourse.includes(course.id) ? <FaHeart /> : <FaRegHeart />}
+                      <a href="#" className="h6 fw-light mb-0" onClick={() => handleLikeCourse(course._id)}>
+                            <FaRegHeart />
                       </a>
                     </div>
 
@@ -194,11 +204,229 @@ const CourseGridBody = () => {
   
 
             </div>
+
+            <div className="col-12">
+              <nav className="mt-4 d-flex justify-content-center" aria-label="navigation">
+                <ul className="pagination pagination-primary-soft rounded mb-0">
+                  {currentPage > 1 && (
+                     <li className="page-item mb-0">
+                      <a className="page-link" href='#' onClick={() => handlePageChange(currentPage - 1)}>
+                        <RiArrowDropLeftLine className='text-[25px]'/>
+                      </a>
+                    </li>
+                  )}
+                 
+                 {[...Array(pageCount)].map((_, index) => (
+                    <li className={`page-item mb-0 ${currentPage === index + 1 ? 'active' : ''}`} key={index}>
+                        <a className="page-link" href='#' onClick={() => handlePageChange(index + 1)}>
+                            {index + 1}
+                        </a>
+                    </li>
+                  ))}
+
+                  {currentPage < pageCount && (
+                      <li className="page-item mb-0">
+                        <a className="page-link"  href='#' onClick={() => handlePageChange(currentPage + 1)}>
+                          <RiArrowDropRightLine className='text-[25px]'/>
+                        </a>
+                      </li>
+                  )}
+
+                </ul>
+              </nav>
+            </div>
     
           </div>
  
           {/* Sidebar Filter-Portion UI */}
-          <div className="col-lg-4 col-xl-3 pt-5 pt-lg-0">      
+          <div className="col-lg-4 col-xl-3 pt-5 pt-lg-0">
+   
+            <nav className="navbar navbar-light navbar-expand-lg mx-0">
+              <div className="offcanvas offcanvas-end" tabIndex={-1} id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+                <div className="offcanvas-header bg-light">
+                  <h5 className="offcanvas-title" id="offcanvasNavbarLabel">Advance Filter</h5>
+                  <button type="button" className="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div className="offcanvas-body p-3 p-lg-0">
+                  <form>
+            
+                      <div className="card card-body shadow p-4 mb-4">
+             
+                        <h4 className="mb-3">Category</h4>
+               
+                        <div className="col-12">
+            
+                          <div className="d-flex justify-content-between align-items-center">
+                            <div className="form-check">
+                              <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault9"/>
+                              <label className="form-check-label" htmlFor="flexCheckDefault9">All</label>
+                            </div>
+                            <span className="small">(1256)</span>
+                          </div>
+                       
+                          <div className="d-flex justify-content-between align-items-center">
+                            <div className="form-check">
+                              <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault10"/>
+                              <label className="form-check-label" htmlFor="flexCheckDefault10">Development</label>
+                            </div>
+                            <span className="small">(365)</span>
+                          </div>
+                    
+                          <div className="d-flex justify-content-between align-items-center">
+                            <div className="form-check">
+                              <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault11"/>
+                              <label className="form-check-label" htmlFor="flexCheckDefault11">Design</label>
+                            </div>
+                            <span className="small">(156)</span>
+                          </div>
+                       
+                          <div className="d-flex justify-content-between align-items-center">
+                            <div className="form-check">
+                              <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault12"/>
+                              <label className="form-check-label" htmlFor="flexCheckDefault12">Accounting</label>
+                            </div>
+                            <span className="small">(65)</span>
+                          </div>
+                      
+                          <div className="d-flex justify-content-between align-items-center">
+                            <div className="form-check">
+                              <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault17"/>
+                              <label className="form-check-label" htmlFor="flexCheckDefault17">Translation</label>
+                            </div>
+                            <span className="small">(245)</span>
+                          </div>
+                       
+                          <div className="d-flex justify-content-between align-items-center">
+                            <div className="form-check">
+                              <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault13"/>
+                              <label className="form-check-label" htmlFor="flexCheckDefault13">Finance</label>
+                            </div>
+                            <span className="small">(184)</span>
+                          </div>
+                       
+                          <div className="d-flex justify-content-between align-items-center">
+                            <div className="form-check">
+                              <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault14"/>
+                              <label className="form-check-label" htmlFor="flexCheckDefault14">Legal</label>
+                            </div>
+                            <span className="small">(65)</span>
+                          </div>
+                    
+                          <div className="d-flex justify-content-between align-items-center">
+                            <div className="form-check">
+                              <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault15"/>
+                              <label className="form-check-label" htmlFor="flexCheckDefault15">Photography</label>
+                            </div>
+                            <span className="small">(99)</span>
+                          </div>
+                          
+                      
+                          <div className="collapse multi-collapse" id="multiCollapseExample1">
+                            <div className="card card-body p-0">
+     
+                              <div className="d-flex justify-content-between align-items-center">
+                                <div className="form-check">
+                                  <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault16"/>
+                                  <label className="form-check-label" htmlFor="flexCheckDefault16">Writing</label>
+                                </div>
+                                <span className="small">(178)</span>
+                              </div>
+                    
+                              <div className="d-flex justify-content-between align-items-center">
+                                <div className="form-check">
+                                  <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault18"/>
+                                  <label className="form-check-label" htmlFor="flexCheckDefault18">Marketing</label>
+                                </div>
+                                <span className="small">(104)</span>
+                              </div>
+                            </div>
+                          </div>
+                       
+                          <a className=" p-0 mb-0 mt-2 btn-more d-flex align-items-center" data-bs-toggle="collapse" href="#multiCollapseExample1" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">
+                            See <span className="see-more ms-1">more</span><span className="see-less ms-1">less</span><i className="fas fa-angle-down ms-2"></i>
+                          </a>
+                        </div>
+                      </div>
+
+                      <div className="card card-body shadow p-4 mb-4">
+                
+                        <h4 className="mb-3">Price Level</h4>
+                        <ul className="list-inline mb-0">
+                   
+                          <li className="list-inline-item">
+                            <input type="radio" className="btn-check" name="options" id="option1"/>
+                            <label className="btn btn-light btn-primary-soft-check" htmlFor="option1">All</label>
+                          </li>
+                       
+                          <li className="list-inline-item">
+                            <input type="radio" className="btn-check" name="options" id="option2"/>
+                            <label className="btn btn-light btn-primary-soft-check" htmlFor="option2">Free</label>
+                          </li>
+                       
+                          <li className="list-inline-item">
+                            <input type="radio" className="btn-check" name="options" id="option3"/>
+                            <label className="btn btn-light btn-primary-soft-check" htmlFor="option3">Paid</label>
+                          </li>
+                        </ul>
+                      </div>
+             
+                      <div className="card card-body shadow p-4 mb-4">
+                    
+                        <h4 className="mb-3">Skill level</h4>
+                        <ul className="list-inline mb-0">
+                    
+                          <li className="list-inline-item mb-2">
+                            <input type="checkbox" className="btn-check" id="btn-check-12"  
+                            checked={selectedskills.length === 0}
+                            onChange={() => setSelectedskills([])}    
+                            />
+                            <label className="btn btn-light btn-primary-soft-check" htmlFor="btn-check-12">All levels</label>
+                          </li>
+                      
+                          {['Beginner', 'Intermediate', 'Advance'].map((level) => (
+                          <li className="list-inline-item mb-2" key={level}>
+                            <input type="checkbox" className="btn-check" 
+                              id={`btn-check-${level}`}
+                              checked={selectedskills.includes(level)}
+                              onChange={() => handleSkillLevelChange(level)}
+                             />
+                            <label className="btn btn-light btn-primary-soft-check" htmlFor={`btn-check-${level}`}>{level}
+                            </label>
+                          </li>
+                          ))}
+                        </ul>
+                      </div>
+               
+                      <div className="card card-body shadow p-4 mb-4">
+                    
+                        <h4 className="mb-3">Language</h4>
+                        <ul className="list-inline mb-0 g-3">
+                      
+                        {['English', 'Francas', 'Hindi','Russian','Bengali','Spanish','Portuguese'].map((level) => (
+                          <li className="list-inline-item mb-2"  key={level}>
+                            <input type="checkbox" className="btn-check"
+                             id={`btn-check-${level}`}
+                             checked={selectedlanguages.includes(level)}
+                             onChange={() => handleLanguageChange(level)}
+                             />
+                            <label className="btn btn-light btn-primary-soft-check" htmlFor={`btn-check-${level}`}>{level}</label>
+                          </li>
+                        ))}
+
+                        </ul> 
+                      </div>
+                    
+                  </form>
+                </div>
+
+              
+                <div className="d-grid p-2 p-lg-0 text-center">
+                  <button className="btn btn-primary mb-0">Filter Results</button>
+                </div>
+
+              </div>
+            </nav>
+         
           </div>
          
         </div>
@@ -209,6 +437,53 @@ const CourseGridBody = () => {
 
       {/* subsribe section */}
       <section className="pt-0">
+      <div className="container position-relative overflow-hidden">
+  
+        <figure className="position-absolute top-50 start-50 translate-middle ms-3">
+          <svg>
+            <path d="m496 22.999c0 10.493-8.506 18.999-18.999 18.999s-19-8.506-19-18.999 8.507-18.999 19-18.999 18.999 8.506 18.999 18.999z" fill="#fff" fill-rule="evenodd" opacity=".502"></path>
+            <path d="m775 102.5c0 5.799-4.701 10.5-10.5 10.5-5.798 0-10.499-4.701-10.499-10.5 0-5.798 4.701-10.499 10.499-10.499 5.799 0 10.5 4.701 10.5 10.499z" fill="#fff" fill-rule="evenodd" opacity=".102"></path>
+            <path d="m192 102c0 6.626-5.373 11.999-12 11.999s-11.999-5.373-11.999-11.999c0-6.628 5.372-12 11.999-12s12 5.372 12 12z" fill="#fff" fill-rule="evenodd" opacity=".2"></path>
+            <path d="m20.499 10.25c0 5.66-4.589 10.249-10.25 10.249-5.66 0-10.249-4.589-10.249-10.249-0-5.661 4.589-10.25 10.249-10.25 5.661-0 10.25 4.589 10.25 10.25z" fill="#fff" fill-rule="evenodd" opacity=".2"></path>
+          </svg>
+        </figure>
+      
+        <figure className="position-absolute bottom-0 end-0 mb-5 d-none d-sm-block">
+          <svg className="rotate-130" width="258.7px" height="86.9px" viewBox="0 0 258.7 86.9">
+            <path stroke="white" fill="none" stroke-width="2" d="M0,7.2c16,0,16,25.5,31.9,25.5c16,0,16-25.5,31.9-25.5c16,0,16,25.5,31.9,25.5c16,0,16-25.5,31.9-25.5 c16,0,16,25.5,31.9,25.5c16,0,16-25.5,31.9-25.5c16,0,16,25.5,31.9,25.5s16-25.5,31.9-25.5"></path>
+            <path stroke="white" fill="none" stroke-width="2" d="M0,57c16,0,16,25.5,31.9,25.5c16,0,16-25.5,31.9-25.5c16,0,16,25.5,31.9,25.5c16,0,16-25.5,31.9-25.5 c16,0,16,25.5,31.9,25.5c16,0,16-25.5,31.9-25.5c16,0,16,25.5,31.9,25.5s16-25.5,31.9-25.5"></path>
+          </svg>
+        </figure>
+        
+        <div className="bg-grad-pink p-3 p-sm-5 rounded-3">
+          <div className="row justify-content-center position-relative">
+
+            <figure className="fill-white opacity-1 position-absolute top-50 start-0 translate-middle-y">
+              <svg width="141px" height="141px">
+                <path d="M140.520,70.258 C140.520,109.064 109.062,140.519 70.258,140.519 C31.454,140.519 -0.004,109.064 -0.004,70.258 C-0.004,31.455 31.454,-0.003 70.258,-0.003 C109.062,-0.003 140.520,31.455 140.520,70.258 Z"></path>
+              </svg>
+            </figure>
+         
+            <div className="col-12 position-relative my-2 my-sm-3">
+              <div className="row align-items-center">
+              
+                <div className="col-lg-6">
+                  <h3 className="text-white mb-3 mb-lg-0">Are you ready for a more great Conversation?</h3>
+                </div>
+               
+                <div className="col-lg-6 text-lg-end">
+                  <form className="bg-body rounded p-2">
+                    <div className="input-group">
+                      <input className="form-control border-0 me-1" type="email" placeholder="Type your email here"/>
+                      <button type="button" className="btn btn-dark mb-0 rounded">Subscribe</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div> 
+        </div>
+      </div>
       </section>
 
     </div>
