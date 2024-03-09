@@ -57,7 +57,7 @@ const getWishlistCourses = async (req, res) => {
   const { userId } = req.user;
 
   try {
-    const wishlistCourses = await WishedCourses.find({ userId });
+    const wishlistCourses = await WishedCourses.find({ userId }) .populate('courseId');
 
     return res.send(
       newResponseObject.create({
