@@ -3,24 +3,27 @@ const WishedCourses = require('../models/wishedcourses');
 const ResponseObjectClass = require('../helpers/ResponseObject');
 const newResponseObject = new ResponseObjectClass();
 
-
-
 const createLikedCourse = async (req, res) => {
   const { userId } = req.user;
   const {courseId } = req.body;
+
   try {
       // Check if the courseId already exists in the database
       const existingWishedCourse = await WishedCourses.findOne({ courseId, userId });
 
       if (existingWishedCourse) {
+        // if already exist then for again paasing the courseId, will delete from db.
+        await WishedCourses.findByIdAndDelete(existingWishedCourse._id);
+
         return res.send(
           newResponseObject.create({
             code: 400,
             success: false,
-            message: 'Course already exists in the wishlist',
+            message: 'Remove the course From Wishlist',
           }),
         );
       }
+
 
      // If courseId doesn't exist, create and save the new wished course
      const  wishedCourse = new WishedCourses({
@@ -50,12 +53,12 @@ const createLikedCourse = async (req, res) => {
 };
 
 
-
-
 const getWishlistCourses = async (req, res) => {
   const { userId } = req.user;
+
   try {
-    const wishlistCourses = await WishedCourses.find({ userId });
+    const wishlistCourses = await WishedCourses.find({ userId }) .populate('courseId');
+
     return res.send(
       newResponseObject.create({
         code: 200,
@@ -79,9 +82,11 @@ const getWishlistCourses = async (req, res) => {
 
 const clearWishlist = async (req, res) => {
   const { userId } = req.user;
+
   try {
     // Delete all wished courses for the user
     await WishedCourses.deleteMany({ userId });
+
     return res.send(
       newResponseObject.create({
         code: 200,
