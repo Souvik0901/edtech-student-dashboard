@@ -35,7 +35,7 @@ const CourseGridBody = () => {
   const [pageCount, setPageCount] = useState<number>(1);
   const [selectedskills, setSelectedskills] = useState<string[]>([]);
   const [selectedlanguages, setSelectedlanguages] = useState<string[]>([]);
-  const [liked, setLiked] = useState<string | null>(null);
+  const [liked, setLiked] = useState<string[]>([]);
 
 
   useEffect(() => {
@@ -97,7 +97,13 @@ const CourseGridBody = () => {
         });
     
         const responseData = response.data;
-        setLiked(prevLiked => prevLiked === courseId ? null : courseId);
+        setLiked(prevLiked => {
+          if (prevLiked.includes(courseId)) {
+            return prevLiked.filter(id => id !== courseId); // Unlike the course if already liked
+          } else {
+            return [...prevLiked, courseId]; // Like the course if not already liked
+          }
+        });
     
       } catch (error) {
         console.error('Error liking course:', error);
@@ -175,7 +181,7 @@ const CourseGridBody = () => {
                     <div className="d-flex justify-content-between mb-2">
                       <a href="#" className="badge bg-purple bg-opacity-10 text-purple">{course.courseLevel}</a>
                       <a href="#" className="h6 fw-light mb-0" onClick={() => handleLikeCourse(course._id)}>
-                      {liked === course._id ? <FaHeart /> : <FaRegHeart />}
+                      {liked.includes(course._id) ? <FaHeart /> : <FaRegHeart />}
                       </a>
                     </div>
 
