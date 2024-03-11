@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { FiClock } from "react-icons/fi";
-import { FcLike } from "react-icons/fc";
+import { FaHeart } from "react-icons/fa";
 import { IoMdStar,IoMdStarHalf } from "react-icons/io";
 import { AiOutlineSchedule } from "react-icons/ai";
 import { axiosInstance } from '@/redux/interceptors';
@@ -30,6 +30,8 @@ interface Course {
 const StudentsBookmark = () => {
   const user = Cookies.get('token');
   const [courses, setCourses] = useState<Course[] | null>(null);
+  const [liked, setLiked] = useState<string[]>([]);
+
 
   useEffect(() => {
     const fetchLikedData = async () => {
@@ -44,6 +46,32 @@ const StudentsBookmark = () => {
 
     fetchLikedData();
   }, []);
+
+
+  const handleLikeCourse = async (courseId: string) => {     
+    try {
+      const response = await axiosInstance.post(`${SERVICE_URL}likedcourse`, { courseId }, {
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          Authorization: user 
+        },
+      });
+  
+      const responseData = response.data;
+      setLiked(prevLiked => {
+        if (prevLiked.includes(courseId)) {
+          return prevLiked.filter(id => id !== courseId); // Unlike the course if already liked
+        } else {
+          return [...prevLiked, courseId]; // Like the course if not already liked
+        }
+      });
+      window.location.reload();
+  
+    } catch (error) {
+      console.error('Error liking course:', error);
+    }
+  };
 
   return (
     <div>
@@ -93,7 +121,7 @@ const StudentsBookmark = () => {
                           <div className="card-body pb-0">
                             <div className="d-flex justify-content-between mb-2">
                               <a href="#" className="badge bg-success bg-opacity-10 text-success">{item.courseId.courseLevel}</a>
-                              <a href="#" className="h6 fw-light mb-0"><i className="far fa-heart"><FcLike /></i></a>
+                              <a href="#" className="h6 fw-light mb-0"  onClick={() => handleLikeCourse(item.courseId._id)}><i className="far fa-heart"><FaHeart style={{ color: 'red' }}/></i></a>
                             </div>
                             <h5 className="card-title fw-normal"><a href="#">{item.courseId.courseTitle}</a></h5>
                             <p className="mb-2 text-truncate-2">Rooms oh fully taken by worse do Points afraid but may end Rooms Points afraid but may end Rooms</p>
