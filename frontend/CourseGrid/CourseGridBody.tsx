@@ -181,7 +181,7 @@ const CourseGridBody = () => {
                     <div className="d-flex justify-content-between mb-2">
                       <a href="#" className="badge bg-purple bg-opacity-10 text-purple">{course.courseLevel}</a>
                       <a href="#" className="h6 fw-light mb-0" onClick={() => handleLikeCourse(course._id)}>
-                      {liked.includes(course._id) ? <FaHeart /> : <FaRegHeart />}
+                        <i className="far fa-heart">{liked.includes(course._id) ? <FaHeart style={{ color: 'red' }}/> : <FaRegHeart />}</i>
                       </a>
                     </div>
 
