@@ -16,6 +16,7 @@ const createLikedCourse = async (req, res) => {
       // if already exist then for again paasing the courseId, will delete from db.
  
       await Courses.findByIdAndUpdate(courseId, { courseLiked: false });
+
       await WishedCourses.findByIdAndDelete(existingWishedCourse._id);
 
       return res.send(
@@ -87,6 +88,15 @@ const clearWishlist = async (req, res) => {
   const { userId } = req.user;
 
   try {
+    // Get all wished courses for the user
+    const wishedCourses = await WishedCourses.find({ userId });
+
+    // Get the ids of all courses in the wishlist
+    const courseIds = wishedCourses.map(wishedCourse => wishedCourse.courseId);
+
+    // Update courseLiked to false for all courses in the wishlist
+    await Courses.updateMany({ _id: { $in: courseIds } }, { courseLiked: false });
+
     // Delete all wished courses for the user
     await WishedCourses.deleteMany({ userId });
 
@@ -109,8 +119,10 @@ const clearWishlist = async (req, res) => {
   }
 };
 
+
 module.exports = {
   createLikedCourse,
   getWishlistCourses,
   clearWishlist,
 };
+
