@@ -4,4 +4,4 @@ BACKEND
 
 
 FRONTEND
-1. In Frontend also Chnages when all click on heart button it stored in db or next time clicking it removed from db without changing color...
+1. In Frontend also Chnages when all click on heart button it stored in db or next time clicking it removed from db with changing red color.
