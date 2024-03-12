@@ -27,6 +27,7 @@ interface course {
 
 const CourseGridBody = () => {
   const user = Cookies.get('token');
+
   const [courses, setCourses] = useState<course[]>([]);
 
   const [search, setSearch] = useState<string>('');
@@ -34,6 +35,8 @@ const CourseGridBody = () => {
   const [pageCount, setPageCount] = useState<number>(1);
   const [selectedskills, setSelectedskills] = useState<string[]>([]);
   const [selectedlanguages, setSelectedlanguages] = useState<string[]>([]);
+  const [liked, setLiked] = useState<string[]>([]);
+
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -83,8 +86,8 @@ const CourseGridBody = () => {
     };
 
     const handleLikeCourse = async (courseId: string) => {
+      
       try {
-        // Make a POST request to the API endpoint to add/remove the course from the wishlist
         const response = await axiosInstance.post(`${SERVICE_URL}likedcourse`, { courseId }, {
           headers: {
             'Content-Type': 'application/json',
@@ -93,8 +96,14 @@ const CourseGridBody = () => {
           },
         });
     
-        // Handle the response data if needed
         const responseData = response.data;
+        setLiked(prevLiked => {
+          if (prevLiked.includes(courseId)) {
+            return prevLiked.filter(id => id !== courseId); // Unlike the course if already liked
+          } else {
+            return [...prevLiked, courseId]; // Like the course if not already liked
+          }
+        });
     
       } catch (error) {
         console.error('Error liking course:', error);
@@ -172,7 +181,7 @@ const CourseGridBody = () => {
                     <div className="d-flex justify-content-between mb-2">
                       <a href="#" className="badge bg-purple bg-opacity-10 text-purple">{course.courseLevel}</a>
                       <a href="#" className="h6 fw-light mb-0" onClick={() => handleLikeCourse(course._id)}>
-                            <FaRegHeart />
+                        <i className="far fa-heart">{liked.includes(course._id) ? <FaHeart style={{ color: 'red' }}/> : <FaRegHeart />}</i>
                       </a>
                     </div>
 
