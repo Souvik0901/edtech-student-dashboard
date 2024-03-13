@@ -1,7 +1,8 @@
-BACKEND
-1. Wishlist Backend API Function Added for stored The liked course collections and remove the course collections...
+Completed The Wishlist portion.
 
+BACKEND
+1. wishControllers.js name updated with wishlistControllers.js
 
 
 FRONTEND
-1. In Frontend also Chnages when all click on heart button it stored in db or next time clicking it removed from db without changing color...
+1. In Frontend also Chnages when all click on heart button it stored in db or next time clicking it removed from db with changing red color.

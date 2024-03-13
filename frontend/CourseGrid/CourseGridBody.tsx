@@ -19,7 +19,8 @@ interface course {
   price: number;
   courseLevel: string;
   courseLanguage: string;
-  _id: string
+  courseLiked: boolean;
+  _id: string;
 }
 
 
@@ -35,7 +36,7 @@ const CourseGridBody = () => {
   const [pageCount, setPageCount] = useState<number>(1);
   const [selectedskills, setSelectedskills] = useState<string[]>([]);
   const [selectedlanguages, setSelectedlanguages] = useState<string[]>([]);
-  const [liked, setLiked] = useState<string[]>([]);
+ 
 
 
   useEffect(() => {
@@ -85,8 +86,7 @@ const CourseGridBody = () => {
       );
     };
 
-    const handleLikeCourse = async (courseId: string) => {
-      
+    const handleLikeCourse = async (courseId: string, courseLiked: boolean) => {
       try {
         const response = await axiosInstance.post(`${SERVICE_URL}likedcourse`, { courseId }, {
           headers: {
@@ -95,16 +95,12 @@ const CourseGridBody = () => {
             Authorization: user 
           },
         });
-    
-        const responseData = response.data;
-        setLiked(prevLiked => {
-          if (prevLiked.includes(courseId)) {
-            return prevLiked.filter(id => id !== courseId); // Unlike the course if already liked
-          } else {
-            return [...prevLiked, courseId]; // Like the course if not already liked
-          }
-        });
-    
+  
+        // Update the courseLiked status in the courses state
+        setCourses(prevCourses => prevCourses.map(course => 
+          course._id === courseId ? { ...course, courseLiked: !courseLiked } : course
+        ));
+  
       } catch (error) {
         console.error('Error liking course:', error);
       }
@@ -180,8 +176,8 @@ const CourseGridBody = () => {
 
                     <div className="d-flex justify-content-between mb-2">
                       <a href="#" className="badge bg-purple bg-opacity-10 text-purple">{course.courseLevel}</a>
-                      <a href="#" className="h6 fw-light mb-0" onClick={() => handleLikeCourse(course._id)}>
-                        <i className="far fa-heart">{liked.includes(course._id) ? <FaHeart style={{ color: 'red' }}/> : <FaRegHeart />}</i>
+                      <a href="#" className="h6 fw-light mb-0" onClick={() => handleLikeCourse(course._id, course.courseLiked)}>
+                            {course.courseLiked ? <FaHeart style={{ color: 'red' }}/> : <FaRegHeart />}
                       </a>
                     </div>
 
