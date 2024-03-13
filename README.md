@@ -1,6 +1,7 @@
+Completed The Wishlist portion.
+
 BACKEND
 1. wishControllers.js name updated with wishlistControllers.js
-
 
 
 FRONTEND
