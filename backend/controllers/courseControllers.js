@@ -62,6 +62,7 @@ const createCourseWithImage = async (req, res) => {
 
 // get all courses
 const getCourses = async (req, res) => {
+  const {userId} = req.user;
   const search = req.query.search || '';
   const courseLevel = req.query.courseLevel || '';
   const courseLanguage = req.query.courseLanguage || '';
@@ -73,7 +74,7 @@ const getCourses = async (req, res) => {
   const sortoption = req.query.sort || '';
 
   try {
-    const courses = await Courses.find({ ...query }).sort({
+    const courses = await Courses.find({userId, ...query }).sort({
       purchaseDate: sortoption === 'Newest' ? -1 : 1,
     });
 
@@ -407,6 +408,30 @@ const updateCourse = async (req, res) => {
   }
 };
 
+// clear all recently-view courses
+const clearAllViewedCourses = async (req, res) => {
+  const { userId } = req.user;
+
+  try {
+    // Delete all recently viewed courses for the user
+    await RecentlyViewed.deleteMany({ userId });
+
+    return res.send({
+      code: 200,
+      success: true,
+      message: 'All viewed courses cleared successfully',
+      data: {},
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      code: 500,
+      success: false,
+      message: 'Internal server error',
+    });
+  }
+};
+
 module.exports = {
   createCourseWithImage,
   paginatedCourses,
@@ -415,5 +440,6 @@ module.exports = {
   getCourses,
   getSingleCourse,
   getRecentlyViewedCourses,
+  clearAllViewedCourses,
 };
 
