@@ -1,9 +1,47 @@
-import React from 'react'
+"use client"
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
+
+import { FaSearch } from "react-icons/fa";
 import instructor01 from '../assets/images/instructor/01.jpg';
-import instructor02 from '../assets/images/instructor/02.jpg';
+import { axiosInstance } from '@/redux/interceptors';
+import { SERVICE_URL } from '@/utils/endpoint';
+import Cookies from 'js-cookie';
+
+
+interface instructor {
+  id:string;
+  name: string,
+  profileImg: string;
+  abouttxt: string;
+  _id: string;
+}
+
 
 const InstructorListBody = () => {
+  const user = Cookies.get('token');
+  const [instructors, setInstructors] = useState<instructor[]>([]);
+
+
+  useEffect(() => {
+    const fetchInstructors = async () => {
+      try {
+        const response = await axiosInstance.get(`${SERVICE_URL}getinstructorsdata`,{
+          headers: {
+            Authorization: user 
+          },
+        });
+        const data: instructor[] = response.data.data;
+        setInstructors(data);
+      
+      } catch (error) {
+        console.error('Error fetching courses:', error);
+      }
+    };
+
+    fetchInstructors();
+  }, []); 
+
   return (
     <div>
       
@@ -36,7 +74,7 @@ const InstructorListBody = () => {
                 <form className="bg-body shadow rounded p-2">
                   <div className="input-group input-borderless">
                     <input className="form-control me-1" type="search" placeholder="Search instructor"/>
-                    <button type="button" className="btn btn-primary mb-0 rounded"><i className="fas fa-search"></i></button>
+                    <button type="button" className="btn btn-primary mb-0 rounded"><i className="fas fa-search"><FaSearch/></i></button>
                   </div>
                 </form>
               </div>
@@ -80,13 +118,13 @@ const InstructorListBody = () => {
 
             <div className="row g-4 justify-content-center">
 
-            
-              <div className="col-lg-10 col-xl-6">
+            {instructors && instructors.map(instructor => (
+              <div className="col-lg-10 col-xl-6" key={instructor.id}>
                 <div className="card shadow p-2">
                   <div className="row g-0">
                   
                     <div className="col-md-4">
-                      <Image src={instructor01} className="rounded-3" alt="..."/>
+                      <Image src={instructor01}   className="rounded-3" alt="..."/>
                     </div>
 
                   
@@ -95,7 +133,7 @@ const InstructorListBody = () => {
                     
                         <div className="d-sm-flex justify-content-sm-between mb-2 mb-sm-3">
                           <div>
-                            <h5 className="card-title mb-0"><a href="#">Dennis Barrett</a></h5>
+                            <h5 className="card-title mb-0"><a href="#">{instructor.name}</a></h5>
                             <p className="small mb-2 mb-sm-0">Professor at Sigma College</p>
                           </div>
                           <span className="h6 fw-light">4.3<i className="fas fa-star text-warning ms-1"></i></span>
@@ -128,52 +166,7 @@ const InstructorListBody = () => {
                 </div>
               </div>
           
-              <div className="col-lg-10 col-xl-6">
-                <div className="card shadow p-2">
-                  <div className="row g-0">
-            
-                    <div className="col-md-4">
-                      <Image src={instructor02} className="rounded-3" alt="..."/>
-                    </div>
-
-                  
-                    <div className="col-md-8">
-                      <div className="card-body">
-                      
-                        <div className="d-sm-flex justify-content-sm-between mb-2 mb-sm-3">
-                          <div>
-                            <h5 className="card-title mb-0"><a href="#">Jacqueline Miller</a></h5>
-                            <p className="small mb-2 mb-sm-0">Professor at Eastbay College</p>
-                          </div>
-                          <span className="h6 fw-light">4.0<i className="fas fa-star text-warning ms-1"></i></span>
-                        </div>
-                        
-                        <p className="text-truncate-2 mb-3">Passage its ten led hearted removal cordial. Preference any astonished unreserved Mrs.</p>
-                      
-                        <div className="d-sm-flex justify-content-sm-between align-items-center">
-                        
-                          <h6 className="text-orange mb-0">Graphic Designer</h6>
-
-                          <ul className="list-inline mb-0 mt-3 mt-sm-0">
-                            <li className="list-inline-item"> 
-                              <a className="mb-0 me-1 text-facebook" href="#"><i className="fab fa-fw fa-facebook-f"></i></a> 
-                            </li>
-                            <li className="list-inline-item"> 
-                              <a className="mb-0 me-1 text-instagram-gradient" href="#"><i className="fab fa-fw fa-instagram"></i></a> 
-                            </li>
-                            <li className="list-inline-item"> 
-                              <a className="mb-0 me-1 text-twitter" href="#"><i className="fab fa-fw fa-twitter"></i></a> 
-                            </li>
-                            <li className="list-inline-item"> 
-                              <a className="mb-0 text-linkedin" href="#"><i className="fab fa-fw fa-linkedin-in"></i></a> 
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            ))}
 
 
             </div>
