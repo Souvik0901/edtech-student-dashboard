@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 
 import { FaSearch } from "react-icons/fa";
-import instructor01 from '../assets/images/instructor/01.jpg';
+import emptyimg from '../assets/images/avatar/defaultprofile.png';
 import { axiosInstance } from '@/redux/interceptors';
 import { SERVICE_URL } from '@/utils/endpoint';
 import Cookies from 'js-cookie';
@@ -124,7 +124,7 @@ const InstructorListBody = () => {
                   <div className="row g-0">
                   
                     <div className="col-md-4">
-                      <Image src={instructor01}   className="rounded-3" alt="..."/>
+                    <Image src={instructor.profileImg ? `${instructor.profileImg}` : emptyimg}  width={190} height={190} className="rounded-3" alt="..." />
                     </div>
 
                   
