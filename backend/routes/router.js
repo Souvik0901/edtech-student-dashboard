@@ -38,6 +38,7 @@ router.post('/emptycart', authenticateUser.verifytoken, cartControllers.emptyCar
 router.post('/addorders', authenticateUser.verifytoken, orderControllers.addOrderitems);
 router.get('/getorderitems', authenticateUser.verifytoken, orderControllers.getOrderitems);
 router.get('/gettopcourses', authenticateUser.verifytoken, orderControllers.getTopCourses);
+router.get('/getstudentsorder', authenticateUser.verifytoken, orderControllers.getStudentorders);
 
 router.get('/getuserdata', authenticateUser.verifytoken, getUserControllers.getUser);
 router.get('/removeuser', authenticateUser.verifytoken, deleteAccount.removeUser);
@@ -48,6 +49,7 @@ router.post(
   upload.single('profileImg'),
   editProfile.changeUserdata,
 );
+router.get('/getinstructorsdata', authenticateUser.verifytoken, getUserControllers.getAllInstructors);
 
 router.post(
   '/createcoursewithimage',
@@ -66,14 +68,25 @@ router.patch(
   courseControllers.updateCourse,
 );
 
-router.get('/recentlyview',authenticateUser.verifytoken,courseControllers.getRecentlyViewedCourses,);
-router.delete('/clearrecentlyview',authenticateUser.verifytoken,courseControllers.clearAllViewedCourses,);
+router.get(
+  '/recentlyview',
+  authenticateUser.verifytoken,
+  courseControllers.getRecentlyViewedCourses,
+);
+router.delete(
+  '/clearrecentlyview',
+  authenticateUser.verifytoken,
+  courseControllers.clearAllViewedCourses,
+);
 
 router.post('/likedcourse', authenticateUser.verifytoken, wishlistControllers.createLikedCourse);
-router.get('/getlikedcourses', authenticateUser.verifytoken, wishlistControllers.getWishlistCourses);
+router.get(
+  '/getlikedcourses',
+  authenticateUser.verifytoken,
+  wishlistControllers.getWishlistCourses,
+);
 router.delete('/clearwishlisted', authenticateUser.verifytoken, wishlistControllers.clearWishlist);
 
 /* Exporting the router object. */
 export default router;
-
 

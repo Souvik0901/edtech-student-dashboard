@@ -407,6 +407,30 @@ const updateCourse = async (req, res) => {
   }
 };
 
+// clear all recently-view courses
+const clearAllViewedCourses = async (req, res) => {
+  const { userId } = req.user;
+
+  try {
+    // Delete all recently viewed courses for the user
+    await RecentlyViewed.deleteMany({ userId });
+
+    return res.send({
+      code: 200,
+      success: true,
+      message: 'All viewed courses cleared successfully',
+      data: {},
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      code: 500,
+      success: false,
+      message: 'Internal server error',
+    });
+  }
+};
+
 module.exports = {
   createCourseWithImage,
   paginatedCourses,
@@ -415,5 +439,6 @@ module.exports = {
   getCourses,
   getSingleCourse,
   getRecentlyViewedCourses,
+  clearAllViewedCourses,
 };
 
