@@ -62,7 +62,6 @@ const createCourseWithImage = async (req, res) => {
 
 // get all courses
 const getCourses = async (req, res) => {
-  const {userId} = req.user;
   const search = req.query.search || '';
   const courseLevel = req.query.courseLevel || '';
   const courseLanguage = req.query.courseLanguage || '';
@@ -74,7 +73,7 @@ const getCourses = async (req, res) => {
   const sortoption = req.query.sort || '';
 
   try {
-    const courses = await Courses.find({userId, ...query }).sort({
+    const courses = await Courses.find({ ...query }).sort({
       purchaseDate: sortoption === 'Newest' ? -1 : 1,
     });
 
