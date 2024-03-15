@@ -1,8 +1,8 @@
-Completed The Wishlist portion.
+Instructor List step01 portion.
 
 BACKEND
-1. wishControllers.js name updated with wishlistControllers.js
+1. 
 
 
 FRONTEND
-1. In Frontend also Chnages when all click on heart button it stored in db or next time clicking it removed from db with changing red color.
+1. 
