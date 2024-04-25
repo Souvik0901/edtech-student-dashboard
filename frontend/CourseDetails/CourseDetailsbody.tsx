@@ -94,12 +94,12 @@ const CourseDetailsbody = () => {
 		collapseEight: false,
   });
 
-  const toggleAccordion = (item: keyof AccordionState) => {
-    setAccordionOpen((prevState) => ({
-      ...prevState,
-      [item]: !prevState[item],
-    }));
-  };
+	const toggleAccordion = (item: keyof AccordionState) => {
+		setAccordionOpen((prevState) => ({
+			...prevState,
+			[item]: !prevState[item as keyof AccordionState],
+		}));
+	};
 	
   const handleStepClick = (step: React.SetStateAction<string>) => {
     setActiveStep(step);
@@ -327,85 +327,57 @@ const CourseDetailsbody = () => {
                     }
      
 										{/* course-pills-02 */}
+										{activeStep === 'Curriculum' && course && (
+											<div className="tab-pane fade show active" id="course-pills-2" role="tabpanel" aria-labelledby="course-pills-tab-2">
+												<div className="accordion accordion-icon accordion-bg-light" id="accordionExample2">
+													{course.curriculum.curriculum.map((lecture, index) => (
+														<div className="accordion-item mb-3" key={index}>
+															<h6 className="accordion-header font-base" id={`heading-${index}`}>
+															<button
+																className={`accordion-button fw-bold rounded d-sm-flex d-inline-block ${
+																	accordionOpen[`collapse${index + 1}` as keyof AccordionState] ? '' : 'collapsed'
+																}`}
+																type="button"
+																onClick={() => toggleAccordion(`collapse${index + 1}` as keyof AccordionState)}
+																aria-expanded={accordionOpen[`collapse${index + 1}` as keyof AccordionState]}
+																aria-controls={`collapse-${index + 1}`}
+															>
 
-										{ activeStep === 'Curriculum' &&
-										<div className="tab-pane fade show active" id="course-pills-2" role="tabpanel" aria-labelledby="course-pills-tab-2">
-										
-										  <div className="accordion accordion-icon accordion-bg-light" id="accordionExample2">
-									
-											<div className="accordion-item mb-3">
-														<h6 className="accordion-header font-base" id="heading-1">
-																<button
-																	className={`accordion-button fw-bold rounded d-sm-flex d-inline-block ${
-																		accordionOpen.collapseOne ? '' : 'collapsed'
-																	}`}
-																	type="button"
-																	onClick={() => toggleAccordion('collapseOne')}
-																	aria-expanded={accordionOpen.collapseOne}
-																	aria-controls="collapse-1"
-																	
-																>
-																	Introduction of Digital Marketing
-																	<span className="small ms-0 ms-sm-2">(3 Lectures)</span>
+																	{lecture.lectureName}
+																	<span className="small ms-0 ms-sm-2">({lecture.topics.length} Lectures)</span>
 																</button>
-														</h6>
-														<div
-															id="collapse-1"
-															className={`accordion-collapse collapse ${
-																accordionOpen.collapseOne ? 'show' : ''
-															}`}
-															aria-labelledby="heading-1"
-															data-bs-parent="#accordionExample2"
-															style={{ visibility: 'visible' }}
-														>
-															<div className="accordion-body mt-3">
-																<div className="d-flex justify-content-between align-items-center">
-																	<div className="position-relative d-flex align-items-center">
-																		<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
-																			<i className="fas fa-play me-0"></i>
-																		</a>
-																		<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">
-																			Introduction
-																		</span>
-																	</div>
-																	<p className="mb-0">2m 10s</p>
-																</div>
-
-																<hr />
-
-																<div className="d-flex justify-content-between align-items-center">
-																	<div className="position-relative d-flex align-items-center">
-																		<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
-																			<i className="fas fa-play me-0"></i>
-																		</a>
-																		<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">
-																			What is Digital Marketing What is Digital Marketing
-																		</span>
-																	</div>
-																	<p className="mb-0 text-truncate">15m 10s</p>
-																</div>
-
-																<hr />
-
-																<div className="d-flex justify-content-between align-items-center">
-																	<div className="position-relative d-flex align-items-center">
-																		<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
-																			<i className="fas fa-play me-0"></i>
-																		</a>
-																		<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">
-																			Type of Digital Marketing
-																		</span>
-																	</div>
-																	<p className="mb-0">18m 10s</p>
+															</h6>
+															<div
+																id={`collapse-${index + 1}`}
+																className={`accordion-collapse collapse ${
+																	accordionOpen[`collapse${index + 1}` as keyof AccordionState] ? 'show' : ''
+																}`}
+																aria-labelledby={`heading-${index}`}
+																data-bs-parent="#accordionExample2"
+																style={{ visibility: 'visible' }}
+															>
+																<div className="accordion-body mt-3">
+																	{lecture.topics.map((topic, topicIndex) => (
+																		<div key={topicIndex} className="d-flex justify-content-between align-items-center">
+																			<div className="position-relative d-flex align-items-center">
+																				<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
+																					<i className="fas fa-play me-0"></i>
+																				</a>
+																				<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">
+																					{topic.topicName}
+																				</span>
+																			</div>
+																			<p className="mb-0">{topic.topicvideo}</p>
+																		</div>
+																	))}
 																</div>
 															</div>
 														</div>
+													))}
 												</div>
+											</div>
+										)}
 
-										  </div>
-										
-									  </div>
-                    }
 								
 								    {/* course-pills-03 */}
 										{ activeStep === 'Instructor' &&
