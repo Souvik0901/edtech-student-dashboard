@@ -2,16 +2,17 @@
 import React, { ChangeEvent, useState, useEffect } from 'react';
 import Image from 'next/image';
 import avatar from '../../components/assets/images/avatar/09.jpg'
-
 import { axiosInstance } from '@/redux/interceptors';
 import { SERVICE_URL } from '@/utils/endpoint';
 import { useRouter } from 'next/navigation';
 import { FaRegCheckCircle, FaFacebook, FaTwitter, FaInstagram,
-	 FaLinkedin, FaYoutube, FaStar, FaPlay, FaUserGraduate,
-	 FaStarHalfAlt, FaRegStar, FaRegThumbsUp, FaRegThumbsDown, 
-	 FaBookOpen, FaClock, FaSignal, FaGlobe, FaMedal, FaUserClock} from "react-icons/fa";
+	       FaLinkedin, FaYoutube, FaStar, FaPlay, FaUserGraduate,
+				 FaStarHalfAlt, FaRegStar, FaRegThumbsUp, FaRegThumbsDown, 
+				 FaBookOpen, FaClock, FaSignal, FaGlobe, FaMedal, FaUserClock} from "react-icons/fa";
 import { AiOutlineMessage } from "react-icons/ai";
 import Cookies from 'js-cookie';
+import defaultImg from '../assets/images/avatar/defaultprofile.png';
+
 
 type AccordionState = {
   collapseOne: boolean;
@@ -19,6 +20,9 @@ type AccordionState = {
   collapseThree: boolean;
   collapseFour: boolean;
   collapseFive: boolean;
+	collapseSix: boolean;
+	collapseSeven: boolean;
+	collapseEight: boolean;
 };
 
 interface Course {
@@ -31,12 +35,27 @@ interface Course {
 	courseCategory: string;
 	courseLevel: string;
 	purchaseDate: string;
-	user_id:{
-	 name: string;
-	 email: string;
-	 profileImg: string;
-	 abouttxt: string;
+	shortDescrp: string;
+	longDescrp: string;
+	period: number;
+	curriculum: {
+    curriculum: {
+      lectureName: string;
+      topics: {
+        topicName: string;
+        topicDescription: string;
+        topicvideo: string;
+      }[];
+    }[];
 	};
+	user_id:{
+		   name: string;
+			 email: string;
+			 profileImg: string;
+			 abouttxt: string;
+			 totalCourses:  number;
+	};
+
 	_id: string;
 }
 
@@ -44,25 +63,25 @@ interface View {
 	map(arg0: (item: any) => React.JSX.Element): unknown;
 	id:string;
 	courseId: {
-	_id:string;
-	courseImage: string,
-	courseTitle: string;
-	lectures: number;
-	price: number;
-	courseLanguage: string;
-	courseCategory: string;
-	courseLevel: string;
-	purchaseDate: string;
+		_id:string;
+		courseImage: string,
+		courseTitle: string;
+		lectures: number;
+		price: number;
+		courseLanguage: string;
+		courseCategory: string;
+		courseLevel: string;
+		purchaseDate: string;
+		period: number;
 	}
 	userId: string;
 	_id: string;
 }
 
 
-const CourseDetailsbody = () => {
-  
-  const router = useRouter();
-  const user = Cookies.get('token');
+const CourseDetailsbody = () => {  
+	const router = useRouter();
+	const user = Cookies.get('token');
   const [activeStep, setActiveStep] = useState('Overview');
   const [accordionOpen, setAccordionOpen] = useState<AccordionState>({
     collapseOne: false,
@@ -70,6 +89,9 @@ const CourseDetailsbody = () => {
     collapseThree: false,
     collapseFour: false,
     collapseFive: false,
+		collapseSix: false,
+		collapseSeven: false,
+		collapseEight: false,
   });
 
   const toggleAccordion = (item: keyof AccordionState) => {
@@ -84,23 +106,24 @@ const CourseDetailsbody = () => {
   };
 
 
-
+	const [course, setCourse] = useState<Course | null>(null);
+	const [view, setView] = useState<View | null>(null);
 	
-const [course, setCourse] = useState<Course | null>(null);
-const [view, setView] = useState<View | null>(null);
 
 
   useEffect(() => {
 		const fetchData = async () => {
 			try {
 				const urlParams = new URLSearchParams(window.location.search);
-				const courseId = urlParams.get('courseId');
-				
+				const courseId = urlParams.get('courseId');		
 				if (courseId) {
 					const courseResponse = await axiosInstance.get(`${SERVICE_URL}getsinglecourse/${courseId}`);
-					setCourse(courseResponse.data.data);	
+					const formattedCourse = {
+						...courseResponse.data.data,
+						purchaseDate: new Date(courseResponse.data.data.purchaseDate).toLocaleDateString()
+					};
+					setCourse(formattedCourse);	
 				}
-
 			} catch (error) {
 				console.error('Error fetching data:', error);
 			}
@@ -108,11 +131,11 @@ const [view, setView] = useState<View | null>(null);
 
 		const fetchViewData = async () => {
 			try {
-				const viewResponse = await axiosInstance.get(`${SERVICE_URL}recentlyview`);
-				console.log('View Response:', viewResponse.data.data);
-				setView(viewResponse.data.data);  
+					const viewResponse = await axiosInstance.get(`${SERVICE_URL}recentlyview`);
+					console.log('View Response:', viewResponse.data.data);
+					setView(viewResponse.data.data);  
 			} catch (error) {
-				console.error('Error fetching data:', error);
+					console.error('Error fetching data:', error);
 			}
 	};
 
@@ -124,7 +147,6 @@ const [view, setView] = useState<View | null>(null);
 
 	const handleSubmit = async(e: { preventDefault: () => void; })=>{
 		e.preventDefault();
-
     const urlParams = new URLSearchParams(window.location.search);
 		const courseId = urlParams.get('courseId');
    
@@ -139,15 +161,15 @@ const [view, setView] = useState<View | null>(null);
 				},
 			}
 		);
-
 		console.log(response.data);
-
 		const responseData = response.data;
 		if(responseData.success){
 			router.push('/cart');
 		}
 			
 	}
+
+
 
   return (
 
@@ -161,15 +183,14 @@ const [view, setView] = useState<View | null>(null);
 					<h6 className="mb-3 font-base bg-primary text-white py-2 px-4 rounded-2 d-inline-block">{course.courseCategory}</h6>
 			
 					<h1>{course.courseTitle}</h1>
-					<p>Satisfied conveying a dependent contented he gentleman agreeable do be. Warrant private blushes removed an in equally totally if. 
-						Delivered dejection necessary objection do Mr prevailed. Mr feeling does chiefly cordial in do.
+					<p>{course.shortDescrp}
 					</p>
 				
 					<ul className="banner-list-item">
 						<li className="banner-list-items-content"><i className="fas fa-star text-warning me-2"><FaStar/></i>4.5/5.0</li>
-						<li className="banner-list-items-content"><i className="fas fa-user-graduate text-orange me-2"><FaUserGraduate/></i>12k Enrolled</li>
+						<li className="banner-list-items-content"><i className="fas fa-user-graduate text-orange me-2"><FaUserGraduate/></i>0 Enrolled</li>
 						<li className="banner-list-items-content"><i className="fas fa-signal text-success me-2"><FaSignal/></i>{course.courseLevel}</li>
-						<li className="banner-list-items-content"><i className="bi bi-patch-exclamation-fill text-danger me-2"></i>Last updated 09/2021</li>
+						<li className="banner-list-items-content"><i className="bi bi-patch-exclamation-fill text-danger me-2"></i>Last updated {course.purchaseDate}</li>
 						<li className="banner-list-items-content"><i className="fas fa-globe text-info me-2"><FaGlobe/></i>{course.courseLanguage}</li>
 					</ul>
          </>
@@ -276,31 +297,32 @@ const [view, setView] = useState<View | null>(null);
 
 										{ activeStep === 'Overview' &&
 										<div className="tab-pane fade show active" id="course-pills-1" role="tabpanel" aria-labelledby="course-pills-tab-1">
-										
-											<h5 className="mb-3">Course Description</h5>
-											<p className="mb-3">Welcome to the <strong> Digital Marketing Ultimate Course Bundle - 12 Courses in 1 (Over 36 hours of content)</strong></p>
-											<p className="mb-3">In this practical hands-on training, you’re going to learn to become a digital marketing expert with this <strong> ultimate course bundle that includes 12 digital marketing courses in 1!</strong></p>
-											<p className="mb-3">If you wish to find out the skills that should be covered in a basic digital marketing course syllabus in India or anywhere around the world, then reading this blog will help. Before we delve into the advanced <strong><a href="#" className="text-reset text-decoration-underline">digital marketing course</a></strong> syllabus, let’s look at the scope of digital marketing and what the future holds.</p>
-											<p className="mb-0">We focus a great deal on the understanding of behavioral psychology and influence triggers which are crucial for becoming a well rounded Digital Marketer. We understand that theory is important to build a solid foundation, we understand that theory alone isn’t going to get the job done so that’s why this course is packed with practical hands-on examples that you can follow step by step.</p>
+									 	{ course &&(
+											<>
+												<div>
+													<h5 className="mb-3">Course Description</h5>
+													<p className="mb-3">{course.longDescrp}</p>
+													
+													<h5 className="mt-4">What you’ll learn</h5>
+													<ul className="list-group list-group-borderless mb-3">
+														<li className="list-group-item h6 fw-light d-flex mb-0"><i className="fas fa-check-circle text-success me-2"><FaRegCheckCircle /></i>Digital marketing course introduction</li>
+														<li className="list-group-item h6 fw-light d-flex mb-0"><i className="fas fa-check-circle text-success me-2"><FaRegCheckCircle /></i>Customer Life cycle</li>
+														<li className="list-group-item h6 fw-light d-flex mb-0"><i className="fas fa-check-circle text-success me-2"><FaRegCheckCircle /></i>What is Search engine optimization(SEO)</li>
+														<li className="list-group-item h6 fw-light d-flex mb-0"><i className="fas fa-check-circle text-success me-2"><FaRegCheckCircle /></i>Facebook ADS</li>
+														<li className="list-group-item h6 fw-light d-flex mb-0"><i className="fas fa-check-circle text-success me-2"><FaRegCheckCircle /></i>Facebook Messenger Chatbot</li>
+														<li className="list-group-item h6 fw-light d-flex mb-0"><i className="fas fa-check-circle text-success me-2"><FaRegCheckCircle /></i>Search engine optimization tools</li>
+														<li className="list-group-item h6 fw-light d-flex mb-0"><i className="fas fa-check-circle text-success me-2"><FaRegCheckCircle /></i>Why SEO</li>
+														<li className="list-group-item h6 fw-light d-flex mb-0"><i className="fas fa-check-circle text-success me-2"><FaRegCheckCircle /></i>URL Structure</li>
+														<li className="list-group-item h6 fw-light d-flex mb-0"><i className="fas fa-check-circle text-success me-2"><FaRegCheckCircle /></i>Featured Snippet</li>
+														<li className="list-group-item h6 fw-light d-flex mb-0"><i className="fas fa-check-circle text-success me-2"><FaRegCheckCircle /></i>SEO tips and tricks</li>
+														<li className="list-group-item h6 fw-light d-flex mb-0"><i className="fas fa-check-circle text-success me-2"><FaRegCheckCircle /></i>Google tag manager</li>
+													</ul>
+
+													<p className="mb-0">As it so contrasted oh estimating instrument. Size like body someone had. Are conduct viewing boy minutes warrant the expense? Tolerably behavior may admit daughters offending her ask own. Praise effect wishes change way and any wanted. Lively use looked latter regard had. Do he it part more last in. </p>
 											
-											<h5 className="mt-4">What you’ll learn</h5>
-											<ul className="list-group list-group-borderless mb-3">
-												<li className="list-group-item h6 fw-light d-flex mb-0"><i className="fas fa-check-circle text-success me-2"><FaRegCheckCircle /></i>Digital marketing course introduction</li>
-												<li className="list-group-item h6 fw-light d-flex mb-0"><i className="fas fa-check-circle text-success me-2"><FaRegCheckCircle /></i>Customer Life cycle</li>
-												<li className="list-group-item h6 fw-light d-flex mb-0"><i className="fas fa-check-circle text-success me-2"><FaRegCheckCircle /></i>What is Search engine optimization(SEO)</li>
-												<li className="list-group-item h6 fw-light d-flex mb-0"><i className="fas fa-check-circle text-success me-2"><FaRegCheckCircle /></i>Facebook ADS</li>
-												<li className="list-group-item h6 fw-light d-flex mb-0"><i className="fas fa-check-circle text-success me-2"><FaRegCheckCircle /></i>Facebook Messenger Chatbot</li>
-												<li className="list-group-item h6 fw-light d-flex mb-0"><i className="fas fa-check-circle text-success me-2"><FaRegCheckCircle /></i>Search engine optimization tools</li>
-												<li className="list-group-item h6 fw-light d-flex mb-0"><i className="fas fa-check-circle text-success me-2"><FaRegCheckCircle /></i>Why SEO</li>
-												<li className="list-group-item h6 fw-light d-flex mb-0"><i className="fas fa-check-circle text-success me-2"><FaRegCheckCircle /></i>URL Structure</li>
-												<li className="list-group-item h6 fw-light d-flex mb-0"><i className="fas fa-check-circle text-success me-2"><FaRegCheckCircle /></i>Featured Snippet</li>
-												<li className="list-group-item h6 fw-light d-flex mb-0"><i className="fas fa-check-circle text-success me-2"><FaRegCheckCircle /></i>SEO tips and tricks</li>
-												<li className="list-group-item h6 fw-light d-flex mb-0"><i className="fas fa-check-circle text-success me-2"><FaRegCheckCircle /></i>Google tag manager</li>
-											</ul>
-
-											<p className="mb-0">As it so contrasted oh estimating instrument. Size like body someone had. Are conduct viewing boy minutes warrant the expense? Tolerably behavior may admit daughters offending her ask own. Praise effect wishes change way and any wanted. Lively use looked latter regard had. Do he it part more last in. </p>
-									
-
+												</div>
+											</>	
+                     )}
 										</div>
                     }
      
@@ -309,629 +331,80 @@ const [view, setView] = useState<View | null>(null);
 										{ activeStep === 'Curriculum' &&
 										<div className="tab-pane fade show active" id="course-pills-2" role="tabpanel" aria-labelledby="course-pills-tab-2">
 										
-											<div className="accordion accordion-icon accordion-bg-light" id="accordionExample2">
+										  <div className="accordion accordion-icon accordion-bg-light" id="accordionExample2">
+									
+											<div className="accordion-item mb-3">
+														<h6 className="accordion-header font-base" id="heading-1">
+																<button
+																	className={`accordion-button fw-bold rounded d-sm-flex d-inline-block ${
+																		accordionOpen.collapseOne ? '' : 'collapsed'
+																	}`}
+																	type="button"
+																	onClick={() => toggleAccordion('collapseOne')}
+																	aria-expanded={accordionOpen.collapseOne}
+																	aria-controls="collapse-1"
+																	
+																>
+																	Introduction of Digital Marketing
+																	<span className="small ms-0 ms-sm-2">(3 Lectures)</span>
+																</button>
+														</h6>
+														<div
+															id="collapse-1"
+															className={`accordion-collapse collapse ${
+																accordionOpen.collapseOne ? 'show' : ''
+															}`}
+															aria-labelledby="heading-1"
+															data-bs-parent="#accordionExample2"
+															style={{ visibility: 'visible' }}
+														>
+															<div className="accordion-body mt-3">
+																<div className="d-flex justify-content-between align-items-center">
+																	<div className="position-relative d-flex align-items-center">
+																		<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
+																			<i className="fas fa-play me-0"></i>
+																		</a>
+																		<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">
+																			Introduction
+																		</span>
+																	</div>
+																	<p className="mb-0">2m 10s</p>
+																</div>
+
+																<hr />
+
+																<div className="d-flex justify-content-between align-items-center">
+																	<div className="position-relative d-flex align-items-center">
+																		<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
+																			<i className="fas fa-play me-0"></i>
+																		</a>
+																		<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">
+																			What is Digital Marketing What is Digital Marketing
+																		</span>
+																	</div>
+																	<p className="mb-0 text-truncate">15m 10s</p>
+																</div>
+
+																<hr />
+
+																<div className="d-flex justify-content-between align-items-center">
+																	<div className="position-relative d-flex align-items-center">
+																		<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
+																			<i className="fas fa-play me-0"></i>
+																		</a>
+																		<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">
+																			Type of Digital Marketing
+																		</span>
+																	</div>
+																	<p className="mb-0">18m 10s</p>
+																</div>
+															</div>
+														</div>
+												</div>
+
+										  </div>
 										
-										 	<div className="accordion-item mb-3">
-												<h6 className="accordion-header font-base" id="heading-1">
-													<button
-														className={`accordion-button fw-bold rounded d-sm-flex d-inline-block ${
-															accordionOpen.collapseOne ? '' : 'collapsed'
-														}`}
-														type="button"
-														onClick={() => toggleAccordion('collapseOne')}
-														aria-expanded={accordionOpen.collapseOne}
-														aria-controls="collapse-1"
-													>
-														Introduction of Digital Marketing
-														<span className="small ms-0 ms-sm-2">(3 Lectures)</span>
-													</button>
-												</h6>
-												<div
-													id="collapse-1"
-													className={`accordion-collapse collapse ${
-														accordionOpen.collapseOne ? 'show' : ''
-													}`}
-													aria-labelledby="heading-1"
-													data-bs-parent="#accordionExample2"
-												>
-													<div className="accordion-body mt-3">
-														<div className="d-flex justify-content-between align-items-center">
-															<div className="position-relative d-flex align-items-center">
-																<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
-																	<i className="fas fa-play me-0"></i>
-																</a>
-																<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">
-																	Introduction
-																</span>
-															</div>
-															<p className="mb-0">2m 10s</p>
-														</div>
-
-														<hr />
-
-														<div className="d-flex justify-content-between align-items-center">
-															<div className="position-relative d-flex align-items-center">
-																<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
-																	<i className="fas fa-play me-0"></i>
-																</a>
-																<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">
-																	What is Digital Marketing What is Digital Marketing
-																</span>
-															</div>
-															<p className="mb-0 text-truncate">15m 10s</p>
-														</div>
-
-														<hr />
-
-														<div className="d-flex justify-content-between align-items-center">
-															<div className="position-relative d-flex align-items-center">
-																<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
-																	<i className="fas fa-play me-0"></i>
-																</a>
-																<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">
-																	Type of Digital Marketing
-																</span>
-															</div>
-															<p className="mb-0">18m 10s</p>
-														</div>
-													</div>
-												</div>
- 										   </div>
-
-												
-												<div className="accordion-item mb-3">
-													<h6 className="accordion-header font-base" id="heading-2">
-														<button className="accordion-button fw-bold collapsed rounded d-sm-flex d-inline-block" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-2" aria-expanded="false" aria-controls="collapse-2">
-															Customer Life cycle
-															<span className="small ms-0 ms-sm-2">(4 Lectures)</span> 
-														</button>
-													</h6>
-													<div id="collapse-2" className="accordion-collapse collapse" aria-labelledby="heading-2" data-bs-parent="#accordionExample2">
-													
-														<div className="accordion-body mt-3">
-															
-															<div className="d-flex justify-content-between align-items-center">
-																<div className="position-relative d-flex align-items-center">
-																	<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
-																		<i className="fas fa-play me-0"></i>
-																	</a>
-																	<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">What is Digital Marketing</span>
-																</div>
-																<p className="mb-0">11m 20s</p>
-															</div>
-
-															<hr/>
-
-														
-															<div className="d-flex justify-content-between align-items-center">
-																<div className="position-relative d-flex align-items-center">
-																	<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
-																		<i className="fas fa-play me-0"></i>
-																	</a>
-																	<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">15 Tips for Writing Magnetic Headlines</span>
-																</div>
-																<p className="mb-0 text-truncate">25m 20s</p>
-															</div>
-															
-															<hr/> 
-
-													
-															<div className="d-flex justify-content-between align-items-center">
-																<div className="position-relative d-flex align-items-center">
-																	<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
-																		<i className="fas fa-play me-0"></i>
-																	</a>
-																	<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">How to Write Like Your Customers Talk</span>
-																</div>
-																<p className="mb-0">11m 30s</p>
-															</div>
-															
-															<hr/> 
-															<div className="d-flex justify-content-between align-items-center">
-																<div className="position-relative d-flex align-items-center">
-																	<div>
-																		<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static" data-bs-toggle="modal" data-bs-target="#exampleModal">
-																			<i className="fas fa-play me-0"></i>
-																		</a>
-																	</div>
-																	<div className="row g-sm-0 align-items-center">
-																		<div className="col-sm-6">
-																			<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-md-400px">How to Flip Features Into Benefits</span>
-																		</div>
-																		<div className="col-sm-6">
-																			<span className="badge bg-orange text-white ms-2 ms-md-0"><i className="fas fa-lock fa-fw me-1"></i>Premium</span>
-																		</div>
-																	</div>
-																</div>
-																<p className="mb-0 d-inline-block text-truncate w-70px w-sm-60px">35m 30s</p>
-															</div>
-														</div>
-												
-													</div>
-												</div>
-
-											
-												<div className="accordion-item mb-3">
-													<h6 className="accordion-header font-base" id="heading-5">
-														<button className="accordion-button fw-bold collapsed rounded d-sm-flex d-inline-block" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-5" aria-expanded="false" aria-controls="collapse-5">
-															What is Search Engine Optimization(SEO) 
-															<span className="small ms-0 ms-sm-2">(10 Lectures)</span> 
-														</button>
-													</h6>
-													<div id="collapse-5" className="accordion-collapse collapse" aria-labelledby="heading-5" data-bs-parent="#accordionExample2">
-											
-														<div className="accordion-body mt-3">
-
-														
-															<div className="d-flex justify-content-between align-items-center">
-																<div className="position-relative d-flex align-items-center">
-																	<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
-																		<i className="fas fa-play me-0"></i>
-																	</a>
-																	<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">Introduction</span>
-																</div>
-																<p className="mb-0">1m 10s</p>
-															</div>
-																
-															<hr/> 
-															<div className="d-flex justify-content-between align-items-center">
-																<div className="position-relative d-flex align-items-center">
-																	<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
-																		<i className="fas fa-play me-0"></i>
-																	</a>
-																	<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">Overview of SEO</span>
-																</div>
-																<p className="mb-0 text-truncate">11m 03s</p>
-															</div>
-
-															<hr/> 
-															<div className="d-flex justify-content-between align-items-center">
-																<div className="position-relative d-flex align-items-center">
-																	<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
-																		<i className="fas fa-play me-0"></i>
-																	</a>
-																	<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">How to SEO Optimise Your Homepage</span>
-																</div>
-																<p className="mb-0">15m 00s</p>
-															</div>
-															
-															<hr/> 
-															<div className="d-flex justify-content-between align-items-center">
-																<div className="position-relative d-flex align-items-center">
-																	<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
-																		<i className="fas fa-play me-0"></i>
-																	</a>
-																	<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">How to SEO Optimise Your Homepage</span>
-																</div>
-																<p className="mb-0">15m 00s</p>
-															</div>
-															
-															<hr/> 
-															<div className="d-flex justify-content-between align-items-center">
-																<div className="position-relative d-flex align-items-center">
-																	<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
-																		<i className="fas fa-play me-0"></i>
-																	</a>
-																	<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">How to Write Title Tags Search Engines Love</span>
-																</div>
-																<p className="mb-0">25m 30s</p>
-															</div>
-															
-															<hr/> 
-															<div className="d-flex justify-content-between align-items-center">
-																<div className="position-relative d-flex align-items-center">
-																	<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
-																		<i className="fas fa-play me-0"></i>
-																	</a>
-																	<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">SEO Keyword Planning</span>
-																</div>
-																<p className="mb-0">18m 10s</p>
-															</div>
-															
-															<hr/> 
-															<div className="d-flex justify-content-between align-items-center">
-																<div className="position-relative d-flex align-items-center">
-																	<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
-																		<i className="fas fa-play me-0"></i>
-																	</a>
-																	<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">eCommerce SEO</span>
-																</div>
-																<p className="mb-0">28m 10s</p>
-															</div>
-															
-															<hr/> 
-															<div className="d-flex justify-content-between align-items-center">
-																<div className="position-relative d-flex align-items-center">
-																	<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
-																		<i className="fas fa-play me-0"></i>
-																	</a>
-																	<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">Internal and External Links</span>
-																</div>
-																<p className="mb-0">45m 10s</p>
-															</div>
-															
-															<hr/>
-															<div className="d-flex justify-content-between align-items-center">
-																<div className="position-relative d-flex align-items-center">
-																	<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
-																		<i className="fas fa-play me-0"></i>
-																	</a>
-																	<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">Mobile SEO</span>
-																</div>
-																<p className="mb-0">8m 10s</p>
-															</div>
-															
-															<hr/> 
-															<div className="d-flex justify-content-between align-items-center">
-																<div className="position-relative d-flex align-items-center">
-																	<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
-																		<i className="fas fa-play me-0"></i>
-																	</a>
-																	<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">Off-page SEO</span>
-																</div>
-																<p className="mb-0">18m 10s</p>
-															</div>
-															
-															<hr/> 
-															<div className="d-flex justify-content-between align-items-center">
-																<div className="position-relative d-flex align-items-center">
-																	<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
-																		<i className="fas fa-play me-0"></i>
-																	</a>
-																	<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">Measuring SEO Effectiveness</span>
-																</div>
-																<p className="mb-0">35m 10s</p>
-															</div>
-														</div>
-														
-													</div>
-												</div>
-
-											
-												<div className="accordion-item mb-3">
-													<h6 className="accordion-header font-base" id="heading-6">
-														<button className="accordion-button fw-bold collapsed rounded d-block d-sm-flex d-inline-block" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-6" aria-expanded="false" aria-controls="collapse-6">
-															Facebook ADS 
-															<span className="small ms-0 ms-sm-2">(3 Lectures)</span> 
-														</button>
-													</h6>
-													<div id="collapse-6" className="accordion-collapse collapse" aria-labelledby="heading-6" data-bs-parent="#accordionExample2">
-														
-														<div className="accordion-body mt-3">
-													
-															<div className="d-flex justify-content-between align-items-center">
-																<div className="position-relative d-flex align-items-center">
-																	<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
-																		<i className="fas fa-play me-0"></i>
-																	</a>
-																	<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">Introduction</span>
-																</div>
-																<p className="mb-0">1m 20s</p>
-															</div>
-															
-															<hr/> 
-															<div className="d-flex justify-content-between align-items-center">
-																<div className="position-relative d-flex align-items-center">
-																	<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
-																		<i className="fas fa-play me-0"></i>
-																	</a>
-																	<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">Creating Facebook Pages</span>
-																</div>
-																<p className="mb-0 text-truncate">25m 20s</p>
-															</div>
-															
-															<hr/> 
-															<div className="d-flex justify-content-between align-items-center">
-																<div className="position-relative d-flex align-items-center">
-																	<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
-																		<i className="fas fa-play me-0"></i>
-																	</a>
-																	<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">Facebook Page Custom URL</span>
-																</div>
-																<p className="mb-0">11m 30s</p>
-															</div>
-														</div>
-														
-													</div>	
-												</div>
-
-											
-												<div className="accordion-item mb-3">
-													<h6 className="accordion-header font-base" id="heading-7">
-														<button className="accordion-button fw-bold collapsed rounded d-sm-flex d-inline-block" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-7" aria-expanded="false" aria-controls="collapse-7">
-															YouTube Marketing 
-															<span className="small ms-0 ms-sm-2">(5 Lectures)</span> 
-														</button>
-													</h6>
-													<div id="collapse-7" className="accordion-collapse collapse" aria-labelledby="heading-7" data-bs-parent="#accordionExample2">
-												
-														<div className="accordion-body mt-3">
-														
-															<div className="d-flex justify-content-between align-items-center">
-																<div className="position-relative d-flex align-items-center">
-																	<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
-																		<i className="fas fa-play me-0"></i>
-																	</a>
-																	<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">Video Flow</span>
-																</div>
-																<p className="mb-0">25m 20s</p>
-															</div>
-															
-															<hr/> 
-															<div className="d-flex justify-content-between align-items-center">
-																<div className="position-relative d-flex align-items-center">
-																	<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
-																		<i className="fas fa-play me-0"></i>
-																	</a>
-																	<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">Webmaster Tool</span>
-																</div>
-																<p className="mb-0 text-truncate">15m 20s</p>
-															</div>
-															
-															<hr/> 
-															<div className="d-flex justify-content-between align-items-center">
-																<div className="position-relative d-flex align-items-center">
-																	<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
-																		<i className="fas fa-play me-0"></i>
-																	</a>
-																	<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">Featured Contents on Channel</span>
-																</div>
-																<p className="mb-0">32m 20s</p>
-															</div>
-															
-															<hr/> 
-															<div className="d-flex justify-content-between align-items-center">
-																<div className="position-relative d-flex align-items-center">
-																	<div>
-																		<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static" data-bs-toggle="modal" data-bs-target="#exampleModal">
-																			<i className="fas fa-play me-0"></i>
-																		</a>
-																	</div>
-																	<div className="row g-sm-0 align-items-center">
-																		<div className="col-sm-6">
-																			<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-md-400px">Managing Comments</span>
-																		</div>
-																		<div className="col-sm-6">
-																			<span className="badge bg-orange text-white ms-2 ms-md-0"><i className="fas fa-lock fa-fw me-1"></i>Premium</span>
-																		</div>
-																	</div>
-																</div>
-																<p className="mb-0 d-inline-block text-truncate w-70px w-sm-60px">20m 20s</p>
-															</div>
-
-															<hr/>
-															<div className="d-flex justify-content-between align-items-center">
-																<div className="position-relative d-flex align-items-center">
-																	<div>
-																		<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static" data-bs-toggle="modal" data-bs-target="#exampleModal">
-																			<i className="fas fa-play me-0"></i>
-																		</a>
-																	</div>
-																	<div className="row g-sm-0 align-items-center">
-																		<div className="col-sm-6">
-																			<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-md-400px">Channel Analytics</span>
-																		</div>
-																		<div className="col-sm-6">
-																			<span className="badge bg-orange text-white ms-2 ms-md-0"><i className="fas fa-lock fa-fw me-1"></i>Premium</span>
-																		</div>
-																	</div>
-																</div>
-																<p className="mb-0 d-inline-block text-truncate w-70px w-sm-60px">18m 20s</p>
-															</div>
-														</div>
-													
-													</div>
-												</div>
-												
-										
-												<div className="accordion-item mb-3">
-													<h6 className="accordion-header font-base" id="heading-8">
-														<button className="accordion-button fw-bold collapsed rounded d-sm-flex d-inline-block" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-8" aria-expanded="false" aria-controls="collapse-8">
-															Why SEO 
-															<span className="small ms-0 ms-sm-2">(8 Lectures)</span> 
-														</button>
-													</h6>
-													<div id="collapse-8" className="accordion-collapse collapse" aria-labelledby="heading-8" data-bs-parent="#accordionExample2">
-														
-														<div className="accordion-body mt-3">
-															
-															<div className="d-flex justify-content-between align-items-center">
-																<div className="position-relative d-flex align-items-center">
-																	<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
-																		<i className="fas fa-play me-0"></i>
-																	</a>
-																	<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">Understanding SEO</span>
-																</div>
-																<p className="mb-0">20m 20s</p>
-															</div>
-															
-															<hr/> 
-															<div className="d-flex justify-content-between align-items-center">
-																<div className="position-relative d-flex align-items-center">
-																	<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
-																		<i className="fas fa-play me-0"></i>
-																	</a>
-																	<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">On-Page SEO</span>
-																</div>
-																<p className="mb-0 text-truncate">15m 20s</p>
-															</div>
-
-															<hr/> 
-															<div className="d-flex justify-content-between align-items-center">
-																<div className="position-relative d-flex align-items-center">
-																	<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
-																		<i className="fas fa-play me-0"></i>
-																	</a>
-																	<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">Local SEO</span>
-																</div>
-																<p className="mb-0">16m 20s</p>
-															</div>
-
-															<hr/> 
-															<div className="d-flex justify-content-between align-items-center">
-																<div className="position-relative d-flex align-items-center">
-																	<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
-																		<i className="fas fa-play me-0"></i>
-																	</a>
-																	<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">Measuring SEO Effectiveness</span>
-																</div>
-																<p className="mb-0">12m 20s</p>
-															</div>
-
-															<hr/>
-															<div className="d-flex justify-content-between align-items-center">
-																<div className="position-relative d-flex align-items-center">
-																	<div>
-																		<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static" data-bs-toggle="modal" data-bs-target="#exampleModal">
-																			<i className="fas fa-play me-0"></i>
-																		</a>
-																	</div>
-																	<div className="row g-sm-0 align-items-center">
-																		<div className="col-sm-6">
-																			<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-md-400px">Keywords in Blog and Articles</span>
-																		</div>
-																		<div className="col-sm-6">
-																			<span className="badge bg-orange text-white ms-2 ms-md-0"><i className="fas fa-lock fa-fw me-1"></i>Premium</span>
-																		</div>
-																	</div>
-																</div>
-																<p className="mb-0 d-inline-block text-truncate w-70px w-sm-60px">15m 20s</p>
-															</div>
-
-															<hr/> 
-															<div className="d-flex justify-content-between align-items-center">
-																<div className="position-relative d-flex align-items-center">
-																	<div>
-																		<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static" data-bs-toggle="modal" data-bs-target="#exampleModal">
-																			<i className="fas fa-play me-0"></i>
-																		</a>
-																	</div>
-																	<div className="row g-sm-0 align-items-center">
-																		<div className="col-sm-6">
-																			<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-md-400px">SEO Keyword Planning</span>
-																		</div>
-																		<div className="col-sm-6">
-																			<span className="badge bg-orange text-white ms-2 ms-md-0"><i className="fas fa-lock fa-fw me-1"></i>Premium</span>
-																		</div>
-																	</div>
-																</div>
-																<p className="mb-0 d-inline-block text-truncate w-70px w-sm-60px">36m 12s</p>
-															</div>
-														</div>
-														
-													</div>
-												</div>	
-
-												
-												<div className="accordion-item mb-3">
-													<h6 className="accordion-header font-base" id="heading-9">
-														<button className="accordion-button fw-bold collapsed rounded d-sm-flex d-inline-block" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-9" aria-expanded="false" aria-controls="collapse-9">
-															Google tag manager  
-															<span className="small ms-0 ms-sm-2">(4 Lectures)</span> 
-														</button>
-													</h6>
-													<div id="collapse-9" className="accordion-collapse collapse" aria-labelledby="heading-9" data-bs-parent="#accordionExample2">
-														
-														<div className="accordion-body mt-3">
-														
-															<div className="d-flex justify-content-between align-items-center">
-																<div className="position-relative d-flex align-items-center">
-																	<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
-																		<i className="fas fa-play me-0"></i>
-																	</a>
-																	<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">G+ Pages Ranks Higher</span>
-																</div>
-																<p className="mb-0">13m 20s</p>
-															</div>
-
-															<hr/> 
-															<div className="d-flex justify-content-between align-items-center">
-																<div className="position-relative d-flex align-items-center">
-																	<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
-																		<i className="fas fa-play me-0"></i>
-																	</a>
-																	<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">Adding Contact Links</span>
-																</div>
-																<p className="mb-0 text-truncate">7m 20s</p>
-															</div>
-
-															<hr/>
-															<div className="d-flex justify-content-between align-items-center">
-																<div className="position-relative d-flex align-items-center">
-																	<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
-																		<i className="fas fa-play me-0"></i>
-																	</a>
-																	<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">Google Hangouts</span>
-																</div>
-																<p className="mb-0">12m 20s</p>
-															</div>
-
-															<hr/>
-															<div className="d-flex justify-content-between align-items-center">
-																<div className="position-relative d-flex align-items-center">
-																	<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
-																		<i className="fas fa-play me-0"></i>
-																	</a>
-																	<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px"> Google Local Business</span>
-																</div>
-																<p className="mb-0 text-truncate">7m 20s</p>
-															</div>
-														</div>
-													
-													</div>
-												</div>	
-
-												
-												<div className="accordion-item mb-0">
-													<h6 className="accordion-header font-base" id="heading-10">
-														<button className="accordion-button fw-bold collapsed rounded d-sm-flex d-inline-block" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-10" aria-expanded="false" aria-controls="collapse-10">
-															Integration with Website 
-															<span className="small ms-0 ms-sm-2">(3 Lectures)</span> 
-														</button>
-													</h6>
-													<div id="collapse-10" className="accordion-collapse collapse" aria-labelledby="heading-10" data-bs-parent="#accordionExample2">
-														
-														<div className="accordion-body mt-3">
-													
-															<div className="d-flex justify-content-between align-items-center">
-																<div className="position-relative d-flex align-items-center">
-																	<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
-																		<i className="fas fa-play me-0"></i>
-																	</a>
-																	<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">Creating LinkedIn Account</span>
-																</div>
-																<p className="mb-0 text-truncate">13m 20s</p>
-															</div>
-															
-															<hr/> 
-															<div className="d-flex justify-content-between align-items-center">
-																<div className="position-relative d-flex align-items-center">
-																	<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
-																		<i className="fas fa-play me-0"></i>
-																	</a>
-																	<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">Advance Searching</span>
-																</div>
-																<p className="mb-0">31m 20s</p>
-															</div>
-
-															<hr/> 
-															<div className="d-flex justify-content-between align-items-center">
-																<div className="position-relative d-flex align-items-center">
-																	<a href="#" className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
-																		<i className="fas fa-play me-0"></i>
-																	</a>
-																	<span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">LinkedIn Mobile App</span>
-																</div>
-																<p className="mb-0 text-truncate">25m 20s</p>
-															</div>
-														</div>
-														
-													</div>
-												</div>	
-
-											</div>
-											
-										</div>
+									  </div>
                     }
 								
 								    {/* course-pills-03 */}
@@ -945,14 +418,18 @@ const [view, setView] = useState<View | null>(null);
 														<div className="row g-0 align-items-center">
 															<div className="col-md-5">
 															
-																<Image src={`${course.user_id.profileImg}`} width={100} height={100}  className="img-fluid rounded-3" alt="instructor-image"/>
+															{course.user_id.profileImg ? (
+                                     <Image src={course.user_id.profileImg} width={100} height={100} className="img-fluid rounded-3" alt="instructor-image" />
+                                     ) : (
+                                    <Image src={defaultImg} width={100} height={100} className="img-fluid rounded-3" alt="default-image" />
+                              )}
 															</div>
 															<div className="col-md-7">
 															
 																<div className="card-body">
 																
 																<h3 className="card-title mb-0">{course.user_id.name}</h3>
-																	<p className="mb-2">Instructor of Marketing</p>
+																	<p className="mb-2">Instructor of Technology</p>
 															
 																	<ul className="list-inline mb-3">
 																		<li className="list-inline-item me-3">
@@ -976,26 +453,26 @@ const [view, setView] = useState<View | null>(null);
 																	<ul className="list-inline">
 																	<li className="list-inline-item">
 																		<div className="d-flex align-items-center me-3 mb-2">
-																			<span className="icon-md bg-orange bg-opacity-10 text-orange rounded-circle flex justify-center align-center"><i className="fas fa-user-graduate"><FaUserGraduate/></i></span>
-																			<span className="h6 fw-light mb-0 ms-2">9.1k</span>
+																			<span className="icon-md bg-orange bg-opacity-10 text-orange rounded-circle flex justify-center align-center"><i className="fas fa-user-graduate" style={{ padding: '0.85rem' }}><FaUserGraduate/></i></span>
+																			<span className="h6 fw-light mb-0 ms-2">0k</span>
 																		</div>
 																	</li>
 																	<li className="list-inline-item">
 																		<div className="d-flex align-items-center me-3 mb-2">
-																			<span className="icon-md bg-warning bg-opacity-15 text-warning rounded-circle flex justify-center align-center"><i className="fas fa-star"><FaStar/></i></span>
-																			<span className="h6 fw-light mb-0 ms-2">4.5</span>
+																			<span className="icon-md bg-warning bg-opacity-15 text-warning rounded-circle flex justify-center align-center"><i className="fas fa-star" style={{ padding: '0.85rem' }}><FaStar/></i></span>
+																			<span className="h6 fw-light mb-0 ms-2">0</span>
 																		</div>
 																	</li>
 																	<li className="list-inline-item">
 																		<div className="d-flex align-items-center me-3 mb-2">
-																			<span className="icon-md bg-danger bg-opacity-10 text-danger rounded-circle flex justify-center align-center"><i className="fas fa-play"><FaPlay/></i></span>
-																			<span className="h6 fw-light mb-0 ms-2">29 Courses</span>
+																			<span className="icon-md bg-danger bg-opacity-10 text-danger rounded-circle flex justify-center align-center"><i className="fas fa-play" style={{ padding: '0.85rem' }}><FaPlay/></i></span>
+																			<span className="h6 fw-light mb-0 ms-2">{course.user_id.totalCourses} Courses</span>
 																		</div>
 																	</li>
 																	<li className="list-inline-item">
 																		<div className="d-flex align-items-center me-3 mb-2">
-																			<span className="icon-md bg-info bg-opacity-10 text-info rounded-circle flex justify-center align-center"><i className="fas fa-comment-dots"><AiOutlineMessage/></i></span>
-																			<span className="h6 fw-light mb-0 ms-2">205</span>
+																			<span className="icon-md bg-info bg-opacity-10 text-info rounded-circle flex justify-center align-center"><i className="fas fa-comment-dots" style={{ padding: '0.85rem' }}><AiOutlineMessage/></i></span>
+																			<span className="h6 fw-light mb-0 ms-2">0</span>
 																		</div>
 																	</li>
 														    	</ul>
@@ -1006,12 +483,7 @@ const [view, setView] = useState<View | null>(null);
 											
 													<h5 className="mb-3">About Instructor</h5>
 													<p className="mb-3">{course.user_id.abouttxt}
-													</p>
-													<p className="mb-3">As it so contrasted oh estimating instrument. Size like body someone had. 
-													    Are conduct viewing boy minutes warrant the expense? Tolerably behavior may admit daughters offending her ask own. 
-															Praise effect wishes change way and any wanted.
-													</p>
-											
+													</p>											
 													<div className="col-12">
 														<ul className="list-group list-group-borderless mb-0">
 															<li className="list-group-item pb-0">Mail ID:<a href="#" className="ms-2">{course.user_id.email}</a></li>
@@ -1195,7 +667,13 @@ const [view, setView] = useState<View | null>(null);
 												<div className="d-md-flex mb-4 ps-4 ps-md-5">
 										
 													<div className="avatar avatar-lg me-4 flex-shrink-0">
-														<Image className="avatar-img rounded-circle" src={`${course.user_id.profileImg}`} width={100} height={100}  alt="avatar"/>
+
+													{course.user_id.profileImg ? (
+                                    <Image className="avatar-img rounded-circle" src={`${course.user_id.profileImg}`} width={100} height={100}  alt="avatar"/>
+                                     ) : (
+                                    <Image  className="avatar-img rounded-circle" src={defaultImg} width={100} height={100}  alt="drafault-image" />
+                              )}
+														
 													</div>
 												
 													<div>
@@ -1530,7 +1008,7 @@ const [view, setView] = useState<View | null>(null);
 											</li>
 											<li className="list-group-item d-flex justify-content-between align-items-center">
 												<span className="list-content-chg"><i className="fas fa-fw fa-clock text-primary"><FaClock/></i>Duration</span>
-												<span>4h 50m</span>
+												<span>{course.period} hours</span>
 											</li>
 											<li className="list-group-item d-flex justify-content-between align-items-center">
 												<span className="list-content-chg"><i className="fas fa-fw fa-signal text-primary"><FaSignal/></i>Skills</span>
