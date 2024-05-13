@@ -13,6 +13,8 @@ import enrollmentList from '../controllers/enrollmentList';
 import cartControllers from '../controllers/cartControllers';
 import orderControllers from '../controllers/orderControllers';
 import wishlistControllers from '../controllers/wishlistControllers';
+import videoUploadControllers from '../controllers/videoUploader';
+import reviewControllers from '../controllers/reviewControllers';
 
 /* Importing the functions from middleware files. */
 import authenticateUser from '../middleware/authenticateUser';
@@ -43,14 +45,19 @@ router.get('/getstudentsorder', authenticateUser.verifytoken, orderControllers.g
 router.get('/getuserdata', authenticateUser.verifytoken, getUserControllers.getUser);
 router.get('/removeuser', authenticateUser.verifytoken, deleteAccount.removeUser);
 router.get('/getenrollmentlist', authenticateUser.verifytoken, enrollmentList.getStudentDetails);
+router.post('/setenrollmentlist', authenticateUser.verifytoken, enrollmentList.setStudentDetails);
+router.post('/changepassword', authenticateUser.verifytoken, editProfile.changePassword);
 router.post(
   '/updateprofileinfo',
   authenticateUser.verifytoken,
   upload.single('profileImg'),
   editProfile.changeUserdata,
 );
-router.get('/getinstructorsdata', authenticateUser.verifytoken, getUserControllers.getAllInstructors);
-
+router.get(
+  '/getinstructorsdata',
+  authenticateUser.verifytoken,
+  getUserControllers.getAllInstructors,
+);
 router.post(
   '/createcoursewithimage',
   authenticateUser.verifytoken,
@@ -87,6 +94,16 @@ router.get(
 );
 router.delete('/clearwishlisted', authenticateUser.verifytoken, wishlistControllers.clearWishlist);
 
+router.post(
+  '/uploadvideo',
+  authenticateUser.verifytoken,
+  upload.single('videoLink'),
+  videoUploadControllers.videoUpload,
+);
+
+router.post('/postreview', authenticateUser.verifytoken, reviewControllers.postReview);
+router.get('/getreview/:id', authenticateUser.verifytoken, reviewControllers.getReview);
+router.get('/getreviews', authenticateUser.verifytoken, reviewControllers.getReviewsInstructorView);
+router.post('/sendreply', authenticateUser.verifytoken, reviewControllers.sendReply);
 /* Exporting the router object. */
 export default router;
-
