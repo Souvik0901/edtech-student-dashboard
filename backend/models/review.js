@@ -7,6 +7,7 @@ const reviewSchema = new Schema({
   review: { type: String, default: '' },
   reply: { type: String, default: '' },
   ratings: { type: String, default: null },
+  instructorId: { type: mongoose.Schema.Types.ObjectId, ref: 'users' },
 });
 
 module.exports = mongoose.model('reviews', reviewSchema);
