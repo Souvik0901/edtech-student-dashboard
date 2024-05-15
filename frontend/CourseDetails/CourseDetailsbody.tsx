@@ -6,13 +6,14 @@ import { axiosInstance } from '@/redux/interceptors';
 import { SERVICE_URL } from '@/utils/endpoint';
 import { useRouter } from 'next/navigation';
 import { FaRegCheckCircle, FaFacebook, FaTwitter, FaInstagram,
-	       FaLinkedin, FaYoutube, FaStar, FaPlay, FaUserGraduate,
-				 FaStarHalfAlt, FaRegStar, FaRegThumbsUp, FaRegThumbsDown, 
-				 FaBookOpen, FaClock, FaSignal, FaGlobe, FaMedal, FaUserClock} from "react-icons/fa";
+         FaLinkedin, FaYoutube, FaStar, FaPlay, FaUserGraduate,
+	 FaStarHalfAlt, FaRegStar, FaRegThumbsUp, FaRegThumbsDown, 
+	 FaBookOpen, FaClock, FaSignal, FaGlobe, FaMedal, FaUserClock} from "react-icons/fa";
 import { AiOutlineMessage } from "react-icons/ai";
 import Cookies from 'js-cookie';
 import defaultImg from '../assets/images/avatar/defaultprofile.png';
 import {Dialog, DialogContent} from '@material-ui/core';
+
 
 type AccordionState = {
   collapseOne: boolean;
@@ -20,26 +21,26 @@ type AccordionState = {
   collapseThree: boolean;
   collapseFour: boolean;
   collapseFive: boolean;
-	collapseSix: boolean;
-	collapseSeven: boolean;
-	collapseEight: boolean;
+  collapseSix: boolean;
+  collapseSeven: boolean;
+  collapseEight: boolean;
 };
 
 interface Course {
-	id:string;
-	courseImage: string,
-	courseTitle: string;
-	lectures: number;
-	price: number;
-	courseLanguage: string;
-	courseCategory: string;
-	courseLevel: string;
-	purchaseDate: string;
-	shortDescrp: string;
-	longDescrp: string;
-	period: number;
-	videoLink: string;
-	curriculum: {
+id:string;
+courseImage: string,
+courseTitle: string;
+lectures: number;
+price: number;
+courseLanguage: string;
+courseCategory: string;
+courseLevel: string;
+purchaseDate: string;
+shortDescrp: string;
+longDescrp: string;
+period: number;
+videoLink: string;
+curriculum: {
     curriculum: {
       lectureName: string;
       topics: {
@@ -48,56 +49,55 @@ interface Course {
         topicvideo: string;
       }[];
     }[];
-	};
-	user_id:{
-		   name: string;
-			 email: string;
-			 profileImg: string;
-			 abouttxt: string;
-			 totalCourses:  number;
-	};
+   };
+   user_id:{
+	name: string;
+	 email: string;
+	profileImg: string;
+	abouttxt: string;
+	totalCourses:  number;
+   };
 
-	_id: string;
+  _id: string;
 }
 
 interface View {
-	map(arg0: (item: any) => React.JSX.Element): unknown;
-	id:string;
-	courseId: {
-		_id:string;
-		courseImage: string,
-		courseTitle: string;
-		lectures: number;
-		price: number;
-		courseLanguage: string;
-		courseCategory: string;
-		courseLevel: string;
-		purchaseDate: string;
-		period: number;
-	}
-	userId: string;
-	_id: string;
+map(arg0: (item: any) => React.JSX.Element): unknown;
+id:string;
+courseId: {
+_id:string;
+courseImage: string,
+courseTitle: string;
+lectures: number;
+price: number;
+courseLanguage: string;
+courseCategory: string;
+courseLevel: string;
+purchaseDate: string;
+period: number;
+}
+userId: string;
+_id: string;
 }
 
 interface Review {
-	map(arg0: (item: any) => React.JSX.Element): unknown;
-	id: string;
-  review: string;
-	ratings: string;
-	reply: string;
-	courseId: string;
-  student:{
-		_id:string;
-		name:string;
-		profileImg: string;
-
-	}
-	_id:string;
+map(arg0: (item: any) => React.JSX.Element): unknown;
+id: string;
+review: string;
+ratings: string;
+reply: string;
+courseId: string;
+student:{
+_id:string;
+name:string;
+profileImg: string;
+}
+_id:string;
 }
 
 const CourseDetailsbody = () => {  
-	const router = useRouter();
-	const user = Cookies.get('token');
+const router = useRouter();
+const user = Cookies.get('token');
   const [activeStep, setActiveStep] = useState('Overview');
   const [accordionOpen, setAccordionOpen] = useState<AccordionState>({
     collapseOne: false,
@@ -105,32 +105,33 @@ const CourseDetailsbody = () => {
     collapseThree: false,
     collapseFour: false,
     collapseFive: false,
-		collapseSix: false,
-		collapseSeven: false,
-		collapseEight: false,
+    collapseSix: false,
+    collapseSeven: false,
+    collapseEight: false,
   });
 
-	const toggleAccordion = (item: keyof AccordionState) => {
-		setAccordionOpen((prevState) => ({
-			...prevState,
-			[item]: !prevState[item as keyof AccordionState],
-		}));
-	};
+const toggleAccordion = (item: keyof AccordionState) => {
+	setAccordionOpen((prevState) => ({
+		...prevState,
+		[item]: !prevState[item as keyof AccordionState],
+	}));
+};
 	
-  const handleStepClick = (step: React.SetStateAction<string>) => {
-    setActiveStep(step);
-  };
+const handleStepClick = (step: React.SetStateAction<string>) => {
+setActiveStep(step);
+};
 
 
-	const [course, setCourse] = useState<Course | null>(null);
-	const [view, setView] = useState<View | null>(null);
-	const [review, setReview] = useState<Review | null>(null);
-	const [buttonPopup, setButtonPopup] = useState(false);
-  const [reviewDetails , setReviewDetails] = useState({
-		review: '',
-		ratings: '',
-		courseId: ''
-	});
+const [course, setCourse] = useState<Course | null>(null);
+const [view, setView] = useState<View | null>(null);
+const [review, setReview] = useState<Review | null>(null);
+const [buttonPopup, setButtonPopup] = useState(false);
+const [reviewDetails , setReviewDetails] = useState({
+	review: '',
+	ratings: '',
+	courseId: ''
+});
+  const [instId, setInstId] = useState('');
 
 
 
@@ -145,6 +146,8 @@ const CourseDetailsbody = () => {
 						...courseResponse.data.data,
 						purchaseDate: new Date(courseResponse.data.data.purchaseDate).toLocaleDateString()
 					};
+					console.log(formattedCourse.user_id._id)
+					setInstId(formattedCourse.user_id._id);
 					setCourse(formattedCourse);	
 				}
 			} catch (error) {
@@ -153,10 +156,9 @@ const CourseDetailsbody = () => {
 		};
 
 		const fetchViewData = async () => {
-			try {
-					const viewResponse = await axiosInstance.get(`${SERVICE_URL}recentlyview`);
-					console.log('View Response:', viewResponse.data.data);
-					setView(viewResponse.data.data);  
+		        try {
+				const viewResponse = await axiosInstance.get(`${SERVICE_URL}recentlyview`);
+				setView(viewResponse.data.data);  
 			} catch (error) {
 					console.error('Error fetching data:', error);
 			}
@@ -164,11 +166,10 @@ const CourseDetailsbody = () => {
 
 		const fetchreviewedData = async () => {
 			try {
-					const urlParams = new URLSearchParams(window.location.search);
-					const courseId = urlParams.get('courseId');	
-				  const reviewedResponse = await axiosInstance.get(`${SERVICE_URL}getreview/${courseId}`);
-          console.log('Reviewed Response:', reviewedResponse.data.data);
-					setReview(reviewedResponse.data.data);
+				const urlParams = new URLSearchParams(window.location.search);
+				const courseId = urlParams.get('courseId');	
+				const reviewedResponse = await axiosInstance.get(`${SERVICE_URL}getreview/${courseId}`);
+				setReview(reviewedResponse.data.data);
 
 			} catch (error) {
 				console.error('Error fetching data:', error);
@@ -212,15 +213,18 @@ const CourseDetailsbody = () => {
 			
 	}
 
+
+
   const postSubmit = async() =>{
 		try {
 			const urlParams = new URLSearchParams(window.location.search);
 			const courseId = urlParams.get('courseId');
-
+      
 			let reviewData : any = new FormData();
 			reviewData.append('review', reviewDetails.review);
 			reviewData.append('ratings', reviewDetails.ratings);
       reviewData.append('courseId', courseId);
+			reviewData.append('instructorId', instId);
 
 			axiosInstance.post(`${SERVICE_URL}postreview`, reviewData)
 			.then((res)=>{
@@ -696,42 +700,30 @@ const CourseDetailsbody = () => {
 																	
 																		<p className="small mb-2">2 days ago</p>
 																		<p className="mb-2">{item.review}</p>
-																		<div className="btn-group" role="group" aria-label="Basic radio toggle button group">
-																			<input type="radio" className="btn-check" name="btnradio" id="btnradio1"/>
-																			<label className="btn btn-outline-light btn-sm mb-0" htmlFor="btnradio1" style={{ display: "flex"}}><i className="far fa-thumbs-up me-1"> <FaRegThumbsUp/></i>25</label>
-																	
-																			<input type="radio" className="btn-check" name="btnradio" id="btnradio2"/>
-																			<label className="btn btn-outline-light btn-sm mb-0" htmlFor="btnradio2" style={{ display: "flex"}}> <i className="far fa-thumbs-down me-1"><FaRegThumbsDown /></i>2</label>
-																		</div>
+																		
 																	</div>
 																</div>
 															
-
-													
+					
 														
-														
-															<div className="d-md-flex mb-4 ps-4 ps-md-5">
-													
-																<div className="avatar avatar-lg me-4 flex-shrink-0">
-
-																{course.user_id.profileImg ? (
+															{item.reply !== "" && (
+																<div className="d-md-flex mb-4 ps-4 ps-md-5">
+																	<div className="avatar avatar-lg me-4 flex-shrink-0">
+																		{course.user_id.profileImg ? (
 																			<Image className="avatar-img rounded-circle" src={`${course.user_id.profileImg}`} width={100} height={100}  alt="avatar"/>
-																			) : (
+																		) : (
 																			<Image  className="avatar-img rounded-circle" src={defaultImg} width={100} height={100}  alt="drafault-image" />
 																		)}
-																	
-																</div>
-															
-																<div>
-																	<div className="d-sm-flex mt-1 mt-md-0 align-items-center">
-																		<h5 className="me-3 mb-0">{course.user_id.name}</h5>
 																	</div>
-														
-																	<p className="small mb-2">1 days ago</p>
-																	<p className="mb-2">{item.reply}</p>
+																	<div>
+																		<div className="d-sm-flex mt-1 mt-md-0 align-items-center">
+																			<h5 className="me-3 mb-0">{course.user_id.name}</h5>
+																		</div>
+																		<p className="small mb-2">1 days ago</p>
+																		<p className="mb-2">{item.reply}</p>
+																	</div>
 																</div>
-															</div>
-
+															)}
 														
 														<hr/>
 														</div>
