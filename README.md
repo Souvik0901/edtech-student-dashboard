@@ -4,4 +4,4 @@ BACKEND
 2. Almost complete without pagination and sorting 
 
 FRONTEND
-1. 
+1. courseDetailsBody.tsx review section modified
