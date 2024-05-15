@@ -1,7 +1,7 @@
 const Review = require('../models/review');
 const ResponseObjectClass = require('../helpers/ResponseObject');
-
 const newResponseObject = new ResponseObjectClass();
+
 const postReview = async (req, res) => {
   try {
     const { userId } = req.user;
@@ -21,6 +21,7 @@ const postReview = async (req, res) => {
       ratings: req.body.ratings,
       courseId: req.body.courseId,
       student: userId,
+      instructorId: req.body.instructorId,
     };
     const reviewData = await Review.create(reviewdata);
     return res.send(
@@ -44,6 +45,8 @@ const postReview = async (req, res) => {
     );
   }
 };
+
+
 const getReview = async (req, res) => {
   try {
     const { userId } = req.user;
@@ -82,10 +85,15 @@ const getReview = async (req, res) => {
   }
 };
 
+
+
 const getReviewsInstructorView = async (req, res) => {
   try {
     const { userId } = req.user;
-    const reviews = await Review.find({ userId }).populate('student').populate('courseId').exec();
+    const reviews = await Review.find({ instructorId: userId })
+      .populate('student')
+      .populate('courseId')
+      .exec();
     if (!reviews || reviews.length === 0) {
       return res.send(
         newResponseObject.create({
@@ -115,10 +123,13 @@ const getReviewsInstructorView = async (req, res) => {
     );
   }
 };
+
+
+
 const sendReply = async (req, res) => {
   try {
     const { reviewId, reply } = req.user;
-    const review = await Review.findOne({ _id: reviewId }); // Assuming reviewId is the ObjectId of the review
+    const review = await Review.findOne({ _id: reviewId });
     if (!review) {
       return res.send(
         newResponseObject.create({
@@ -160,6 +171,8 @@ const sendReply = async (req, res) => {
     );
   }
 };
+
+
 
 module.exports = {
   postReview,
